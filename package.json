@@ -41,6 +41,8 @@
     ]
   },
   "devDependencies": {
-    "child-process-promise": "^2.2.1"
+    "canvas": "^2.6.1",
+    "child-process-promise": "^2.2.1",
+    "image-hash": "^4.0.1"
   }
 }
