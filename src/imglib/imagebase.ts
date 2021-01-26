@@ -1,21 +1,44 @@
 import { textChangeRangeIsUnchanged } from "typescript";
 
 
+interface TypedArray {
+    readonly length : number;
+    [n: number]: number;
+}
 
-export class ImageBase {
+interface TypedArrayConstructor<T extends TypedArray> {
+    new (buffer: ArrayBuffer, byteOffset?: number, length?: number): T;
+}
 
-    private buffer : ArrayBuffer
-    private pixels : Uint16Array [] 
 
-    constructor( width : number, height : number ) {
-        let nPixels = width * height;
-        let bytes  = nPixels * Uint16Array.BYTES_PER_ELEMENT;
-        this.buffer= new ArrayBuffer(bytes);
-        this.pixels= Array.from(Array(height), (e,i)=>
-            new Uint16Array(this.buffer, width*Uint16Array.BYTES_PER_ELEMENT*i, width)
-        ) 
+export class ImageFactory {
+
+    static Uint16( width : number, height : number ){
+        return new ImageBase<Uint16Array,Uint16ArrayConstructor>(Uint16Array.BYTES_PER_ELEMENT, Uint16Array, width, height)
+    }
+    static Uint8( width : number, height : number ){
+        return new ImageBase<Uint8Array,Uint8ArrayConstructor>(Uint8Array.BYTES_PER_ELEMENT, Uint8Array, width, height)
+    }
+    static Float32( width : number, height : number ){
+        return new ImageBase<Float32Array,Float32ArrayConstructor>(Float32Array.BYTES_PER_ELEMENT, Float32Array, width, height)
     }
 
+}
+
+
+class ImageBase<T extends TypedArray, C extends TypedArrayConstructor<T>> {
+
+    private buffer : ArrayBuffer
+    private pixels : T [] 
+
+    constructor( elementSize : number, constructor : C, width : number, height : number ) {
+        let nPixels= width * height;
+        let bytes  = nPixels * elementSize
+        this.buffer= new ArrayBuffer(bytes);
+        this.pixels= Array.from(Array(height), (e,i)=> new constructor (this.buffer, width*elementSize*i, width)
+        ) 
+    }
+    
     /**
      *  get the image buffer
      */
@@ -51,7 +74,7 @@ export class ImageBase {
      * get a row of pixels
      * @param y row of pixels to select.
      */
-    getRow(y:number) : Uint16Array {
+    getRow(y:number) : T {
         if( y<0 || y>this.height )throw new Error (`Invalid y coordinate queried : image height ${this.height} y ${y}`)
         return this.pixels[y]
     }

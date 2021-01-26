@@ -1,10 +1,10 @@
-import { assert } from 'console'
-import {ImageBase} from './imagebase'
+
+import {ImageFactory} from './imagebase'
 
 test('shall report correct image size',()=>{
     let width =5
     let height=3
-    let image = new ImageBase(width, height)
+    let image = ImageFactory.Uint16(width, height)
     expect(image.height).toEqual(height)
     expect(image.width).toEqual(width)
 })
@@ -12,7 +12,7 @@ test('shall report correct image size',()=>{
 test('shall allow to set and get pixel values', ()=>{
     let width =5
     let height=3
-    let image = new ImageBase(width, height)
+    let image = ImageFactory.Uint16(width, height)
     let x=2;
     let y=0
     let v=124
@@ -23,7 +23,7 @@ test('shall allow to set and get pixel values', ()=>{
 test('shall throw on invalid coordinated',()=>{
     let width =5
     let height=3
-    let image = new ImageBase(width, height)
+    let image = ImageFactory.Uint16(width, height)
 
     expect(()=>{
         let v = image.get(1, -1)
@@ -38,7 +38,7 @@ test('shall throw on invalid coordinated',()=>{
 test('shall provide image buffer',()=>{
     let width =5
     let height=3
-    let image = new ImageBase(width, height)
+    let image = ImageFactory.Uint16(width, height)
     let x=2;
     let y=1
     let v=124
@@ -54,7 +54,7 @@ test('shall provide image buffer',()=>{
 test('shall provide row buffer',()=>{
     let width =5
     let height=3
-    let image = new ImageBase(width, height)
+    let image = ImageFactory.Uint16(width, height)
     let x=2;
     let y=1
     let v=124
@@ -65,4 +65,17 @@ test('shall provide row buffer',()=>{
     expect(rPixels[x]).toEqual(124)
     expect(rPixels[0]).toEqual(0)
 
+})
+
+test('shall support 8 bit array',()=>{
+    let image = ImageFactory.Uint8(3,2)
+    image.set(1,1,5)  
+    expect(image.get(1,1)).toBe(5)
+})
+
+test('shall support float values',()=>{
+    let image=ImageFactory.Float32(3,2)
+    let val = -3.2
+    image.set(1,1,val)
+    expect(image.get(1,1)).toBeCloseTo(val, 5)
 })
