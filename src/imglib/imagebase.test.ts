@@ -33,6 +33,10 @@ test('shall throw on invalid coordinated',()=>{
         image.set(-1, 2,0)
     }).toThrow()
 
+    expect(()=>{
+        image.getRow(-1)
+    })
+
 })
 
 test('shall provide image buffer',()=>{
@@ -49,6 +53,21 @@ test('shall provide image buffer',()=>{
     expect(pixels[y*width+x]).toEqual(124)
     expect(pixels[0]).toEqual(0)
 
+})
+
+test('shall provide access to pixel data row major',()=>{
+    let width =5
+    let height=3
+    let image = ImageFactory.Uint16(width, height)
+    let x=2;
+    let y=1
+    let v=124
+    image.set(x,y,v)
+    
+    let pixels = image.imagePixels;
+    expect(pixels[y*width+x]).toBe(v)
+    expect(pixels[0]).toBe(0)
+    expect(pixels.length).toBe(width*height)
 })
 
 test('shall provide row buffer',()=>{

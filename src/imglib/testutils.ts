@@ -42,6 +42,27 @@ export async function dumpImage(canvas : Canvas, name? : string ) : Promise<void
     await saveCanvas(canvas, fullname)
 }
 
+export function toHTMLCanvas(nCanvas : Canvas) : HTMLCanvasElement {
+    let hCanvas = document.createElement('canvas')
+    hCanvas.width = nCanvas.width
+    hCanvas.height= nCanvas.height
+    let hCtx = hCanvas.getContext('2d')
+    let nCtx = nCanvas.getContext('2d')
+    let nDat = nCtx.getImageData(0,0,nCanvas.width,nCanvas.height)
+    hCtx?.putImageData(nDat, 0, 0)
+    return hCanvas
+}
+
+export function toNodeCanvas(hCanvas : HTMLCanvasElement) : Canvas {
+    let nCanvas = createCanvas(hCanvas.width,hCanvas.height)
+    let hCtx = hCanvas.getContext('2d') as CanvasRenderingContext2D
+    let nCtx = nCanvas.getContext('2d')
+    let hDat = hCtx.getImageData(0,0,nCanvas.width,nCanvas.height) 
+    nCtx?.putImageData(hDat, 0, 0)  
+    return nCanvas
+}
+
+
 export async function saveCanvas( canvas : Canvas, filename : string ) : Promise<void>{
     return new Promise( (res,rej)=>{
         const out = fs.createWriteStream(`${filename}.png`)

@@ -4,39 +4,42 @@ import { textChangeRangeIsUnchanged } from "typescript";
 interface TypedArray {
     readonly length : number;
     [n: number]: number;
+    buffer : ArrayBuffer;
 }
 
 interface TypedArrayConstructor<T extends TypedArray> {
     new (buffer: ArrayBuffer, byteOffset?: number, length?: number): T;
 }
 
+export type ImageUint8  = ImageBase<Uint8Array,Uint8ArrayConstructor>
+export type ImageUint16 = ImageBase<Uint16Array,Uint16ArrayConstructor>
+export type ImageFloat32= ImageBase<Float32Array,Float32ArrayConstructor>
 
 export class ImageFactory {
 
-    static Uint16( width : number, height : number ){
-        return new ImageBase<Uint16Array,Uint16ArrayConstructor>(Uint16Array.BYTES_PER_ELEMENT, Uint16Array, width, height)
-    }
-    static Uint8( width : number, height : number ){
+    static Uint8( width : number, height : number ) : ImageUint8 {
         return new ImageBase<Uint8Array,Uint8ArrayConstructor>(Uint8Array.BYTES_PER_ELEMENT, Uint8Array, width, height)
     }
-    static Float32( width : number, height : number ){
+    static Uint16( width : number, height : number ) : ImageUint16{
+        return (new ImageBase<Uint16Array,Uint16ArrayConstructor>(Uint16Array.BYTES_PER_ELEMENT, Uint16Array, width, height)) 
+    }
+    static Float32( width : number, height : number ): ImageFloat32{
         return new ImageBase<Float32Array,Float32ArrayConstructor>(Float32Array.BYTES_PER_ELEMENT, Float32Array, width, height)
     }
-
 }
 
 
 class ImageBase<T extends TypedArray, C extends TypedArrayConstructor<T>> {
 
-    private buffer : ArrayBuffer
+    private buffer : T
     private pixels : T [] 
 
     constructor( elementSize : number, constructor : C, width : number, height : number ) {
         let nPixels= width * height;
         let bytes  = nPixels * elementSize
-        this.buffer= new ArrayBuffer(bytes);
-        this.pixels= Array.from(Array(height), (e,i)=> new constructor (this.buffer, width*elementSize*i, width)
-        ) 
+        let buffer= new ArrayBuffer(bytes);
+        this.pixels= Array.from(Array(height), (e,i)=> new constructor (buffer, width*elementSize*i, width) ) 
+        this.buffer= new constructor(buffer, 0, nPixels)
     }
 
 
@@ -48,10 +51,17 @@ class ImageBase<T extends TypedArray, C extends TypedArrayConstructor<T>> {
     }
 
     /**
+     * returns the current list of pixels.
+     */
+    get imagePixels(): T {
+        return this.buffer 
+    }
+
+    /**
      *  get the image buffer
      */
     get imageBuffer() : ArrayBuffer {
-        return this.buffer
+        return this.buffer.buffer
     }
 
     /**
