@@ -67,6 +67,15 @@ test('shall provide row buffer',()=>{
 
 })
 
+test('shall support multiple type of pixel types',()=>{
+    let u16 = ImageFactory.Uint16(2,2)
+    let u8  = ImageFactory.Uint8(2,2)
+    let f32 = ImageFactory.Float32(2,2)
+    expect(u16.imageType).toBe('Uint16')
+    expect(u8.imageType).toBe('Uint8')
+    expect(f32.imageType).toBe('Float32')
+})
+
 test('shall support 8 bit array',()=>{
     let image = ImageFactory.Uint8(3,2)
     image.set(1,1,5)  

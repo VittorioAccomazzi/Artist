@@ -38,7 +38,15 @@ class ImageBase<T extends TypedArray, C extends TypedArrayConstructor<T>> {
         this.pixels= Array.from(Array(height), (e,i)=> new constructor (this.buffer, width*elementSize*i, width)
         ) 
     }
-    
+
+
+    /**
+     * get type of pixel stored.
+     */
+    get imageType(): string {
+        return this.pixels[0].constructor.name.replace('Array','')
+    }
+
     /**
      *  get the image buffer
      */
