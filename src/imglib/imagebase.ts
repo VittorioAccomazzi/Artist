@@ -1,5 +1,3 @@
-import { textChangeRangeIsUnchanged } from "typescript";
-
 
 interface TypedArray {
     readonly length : number;
@@ -11,9 +9,16 @@ interface TypedArrayConstructor<T extends TypedArray> {
     new (buffer: ArrayBuffer, byteOffset?: number, length?: number): T;
 }
 
+
 export type ImageUint8  = ImageBase<Uint8Array,Uint8ArrayConstructor>
 export type ImageUint16 = ImageBase<Uint16Array,Uint16ArrayConstructor>
 export type ImageFloat32= ImageBase<Float32Array,Float32ArrayConstructor>
+
+// this is the generic Image type. Using this approach we avoid to expose
+// the complexity of the generic used below.
+
+export type Image2D = ImageUint8 | ImageUint16 | ImageFloat32
+export type ImagePixels = Uint8Array | Uint16Array | Float32Array
 
 export class ImageFactory {
 

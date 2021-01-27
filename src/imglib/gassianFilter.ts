@@ -1,4 +1,4 @@
-import {ImageFactory, ImageUint8} from './imagebase'
+import {ImageFactory, Image2D, ImagePixels} from './imagebase'
 
 export default class GaussianFilter {
 
@@ -7,7 +7,7 @@ export default class GaussianFilter {
      * @param inImg input and output image
      * @param sigma kernel size
      */
-    static Run(inImg : ImageUint8, sigma : number)  {
+    static Run(inImg : Image2D, sigma : number)  {
 
         if( sigma <0 ) throw Error ( `Invalid Gaissian Sigma : ${sigma}` )
 
@@ -40,7 +40,7 @@ export default class GaussianFilter {
          return kernel.map(v=>v/sum)
      }
 
-     private static applySeparableKernel( iPixels : Uint8Array, kernel : number [], width : number, height : number  ) : void {
+     private static applySeparableKernel( iPixels : ImagePixels, kernel : number [], width : number, height : number  ) : void {
         let tmpImage = ImageFactory.Float32(width, height)
         let tPixels = tmpImage.imagePixels
         let kRadius = (kernel.length-1)/2
