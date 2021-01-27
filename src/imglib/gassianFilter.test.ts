@@ -18,8 +18,8 @@ test('check PSF for Gaussian Filter', async ()=>{
             }
         }
     
-        let gassian = GaussianFilter.Run(image, kernelSize)
-        let canvas  = toNodeCanvas( CanvasUtils.Compose(gassian, gassian, gassian) )
+        GaussianFilter.Run(image, kernelSize)
+        let canvas  = toNodeCanvas( CanvasUtils.Compose(image, image, image) )
         await dumpImage( canvas, `Gaussian-psf-${kernelSize}`)
     
         let gHash = hash(canvas)
@@ -30,10 +30,10 @@ test('check PSF for Gaussian Filter', async ()=>{
 test('validate hash', async()=>{
     for await ( const [canvas] of getCanvases() ) {
         const [ red, green, blue] = CanvasUtils.Split(toHTMLCanvas(canvas)) 
-        let gRed   = GaussianFilter.Run(red, 4)
-        let gGreen = GaussianFilter.Run(green, 4)
-        let gBlue  = GaussianFilter.Run(blue, 4)
-        const gaussian = toNodeCanvas(CanvasUtils.Compose(gRed, gGreen, gBlue))
+        GaussianFilter.Run(red, 4)
+        GaussianFilter.Run(green, 4)
+        GaussianFilter.Run(blue, 4)
+        const gaussian = toNodeCanvas(CanvasUtils.Compose(red, green, blue))
         let hsh = hash(gaussian)
         expect(hsh).toMatchSnapshot()
     }

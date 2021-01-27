@@ -2,7 +2,12 @@ import {ImageFactory, ImageUint8} from './imagebase'
 
 export default class GaussianFilter {
 
-    static Run(inImg : ImageUint8, sigma : number) : ImageUint8 {
+    /**
+     * filters in place the input image.
+     * @param inImg input and output image
+     * @param sigma kernel size
+     */
+    static Run(inImg : ImageUint8, sigma : number)  {
 
         if( sigma <0 ) throw Error ( `Invalid Gaissian Sigma : ${sigma}` )
 
@@ -11,12 +16,9 @@ export default class GaussianFilter {
         const width = inImg.width
         const height= inImg.height
         const iPixel= inImg.imagePixels
-        const ouImg = ImageFactory.Uint8(width,height)
-        const oPixel= ouImg.imagePixels
 
-        GaussianFilter.applySeparableKernel(iPixel, oPixel, kernel, width, height)
+        GaussianFilter.applySeparableKernel(iPixel, kernel, width, height)
 
-        return ouImg;
     }
 
      private static buildKernel(sigma : number ) : number [] {
@@ -38,7 +40,7 @@ export default class GaussianFilter {
          return kernel.map(v=>v/sum)
      }
 
-     private static applySeparableKernel( iPixels : Uint8Array, oPixels : Uint8Array, kernel : number [], width : number, height : number  ) : void {
+     private static applySeparableKernel( iPixels : Uint8Array, kernel : number [], width : number, height : number  ) : void {
         let tmpImage = ImageFactory.Float32(width, height)
         let tPixels = tmpImage.imagePixels
         let kRadius = (kernel.length-1)/2
@@ -70,7 +72,7 @@ export default class GaussianFilter {
                     if( pos >= height) pos = 2*height-2 -pos
                     sum += kernel[k]*tPixels[pos*width+x]
                 }
-                oPixels[y*width+x]=sum
+                iPixels[y*width+x]=sum
             }
         }
      }
