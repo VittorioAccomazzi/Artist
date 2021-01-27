@@ -22,7 +22,6 @@ test('validate hash', async()=>{
         ctx.strokeStyle="FF0A00"
         ctx.fillRect(canvas.width/2, canvas.height/2,20,20)
         ctx.stroke()
-        dumpImage(canvas)
         let h2 = await hash(canvas)
         expect(h1).not.toEqual(h2)
     }

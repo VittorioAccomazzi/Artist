@@ -1,4 +1,4 @@
-import {hash, getCanvases, toHTMLCanvas, toNodeCanvas, dumpImage} from './testutils'
+import {hash, getCanvases, toHTMLCanvas, toNodeCanvas} from './testutils'
 import CanvasUtils from './canvasUtils'
 
 fit('shall split and combine canvas in images',async ()=>{

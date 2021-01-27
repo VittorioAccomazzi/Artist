@@ -2,6 +2,10 @@ import {ImageFactory, ImageUint8} from './imagebase'
 
 export default class CanvasUtils {
 
+    /**
+     *  Generate the canvas's channels (red, green, blue and alpha) in separate images.
+     * @param canvas 
+     */
     static Split( canvas : HTMLCanvasElement ) : [ ImageUint8, ImageUint8, ImageUint8, ImageUint8 ] {
         let width = canvas.width
         let height= canvas.height
@@ -29,6 +33,13 @@ export default class CanvasUtils {
         return [ imgR, imgG, imgB, imgA ]
     }
 
+    /**
+     * generate a canvas object using the images provided as channels.
+     * @param imgR 
+     * @param imgG 
+     * @param imgB 
+     * @param imgA 
+     */
     static Compose( imgR : ImageUint8, imgG : ImageUint8, imgB : ImageUint8, imgA? : ImageUint8 ): HTMLCanvasElement {
         let width = imgR.width
         let height= imgR.height
