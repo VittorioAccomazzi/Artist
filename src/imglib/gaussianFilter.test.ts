@@ -1,7 +1,7 @@
 import {hash, getCanvases, toHTMLCanvas, toNodeCanvas, dumpImage} from './testutils'
 import {ImageFactory} from './imagebase'
 import CanvasUtils from './canvasUtils'
-import GaussianFilter from './GassianFilter'
+import GaussianFilter from './gaussianFilter'
 
 test('check PSF for Gaussian Filter', async ()=>{
     let kernelSizes : number [] = [ 10, 5, 2 ]
