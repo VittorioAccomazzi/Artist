@@ -84,3 +84,27 @@ test('shall throw on invalid coordinate',()=>{
         let a = grad.gradient(2,50)
     }).toThrow()
 })
+
+test('shall support all image type',()=>{
+    let width = 8
+    let height= 7
+    let img16 = ImageFactory.Uint16(width,height)
+    let img32 = ImageFactory.Float32(width,height)
+    let size = 5
+    for( let y=0; y<size; y++){
+        for( let x=0; x<size; x++ ){
+            img16.set(x, y, 1)
+            img32.set(x, y, 1)
+        }
+    }
+    let grad16 = new Gradient(img16)
+    let grad32 = new Gradient(img32)
+
+    let g16 = grad16.gradient(4,4)
+    expect(g16[0]).toBe(-3)
+    expect(g16[1]).toBe(-3)
+
+    let g32 = grad32.gradient(4,4)
+    expect(g32[0]).toBe(-3)
+    expect(g32[1]).toBe(-3)
+})
