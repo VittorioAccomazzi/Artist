@@ -3,6 +3,7 @@ interface TypedArray {
     readonly length : number;
     [n: number]: number;
     buffer : ArrayBuffer;
+    reduce ( func : (total : number, currentValue : number, index : number ) => number, initialvalue : number) : number;
 }
 
 interface TypedArrayConstructor<T extends TypedArray> {
@@ -19,6 +20,7 @@ export type ImageFloat32= ImageBase<Float32Array,Float32ArrayConstructor>
 
 export type Image2D = ImageUint8 | ImageUint16 | ImageFloat32
 export type ImagePixels = Uint8Array | Uint16Array | Float32Array
+export type ImageType = 'Uint8' | 'Uint16' | 'Float32'
 
 export class ImageFactory {
 
@@ -30,6 +32,16 @@ export class ImageFactory {
     }
     static Float32( width : number, height : number ): ImageFloat32{
         return new ImageBase<Float32Array,Float32ArrayConstructor>(Float32Array.BYTES_PER_ELEMENT, Float32Array, width, height)
+    }
+    static Image(type : ImageType, width : number, height : number ) : Image2D {
+        switch( type ){
+            case 'Uint8':
+                return ImageFactory.Uint8(width,height)
+            case 'Uint16':
+                return ImageFactory.Uint16(width,height)
+            case 'Float32':
+                return ImageFactory.Float32(width,height)
+        }
     }
 }
 
@@ -51,8 +63,8 @@ class ImageBase<T extends TypedArray, C extends TypedArrayConstructor<T>> {
     /**
      * get type of pixel stored.
      */
-    get imageType(): string {
-        return this.pixels[0].constructor.name.replace('Array','')
+    get imageType(): ImageType {
+        return this.pixels[0].constructor.name.replace('Array','') as ImageType
     }
 
     /**
@@ -94,6 +106,20 @@ class ImageBase<T extends TypedArray, C extends TypedArrayConstructor<T>> {
     }
 
     /**
+     * max pixel value in the image
+     */
+    maxValue() : number {
+        return this.buffer.reduce((max, val, idx)=>Math.max(val,max),this.buffer[0])
+    }
+
+    /**
+     * min pixel value in the image
+     */
+    minValue() : number {
+        return this.buffer.reduce((min, val, idx)=>Math.min(val,min),this.buffer[0])
+    }
+
+    /**
      * get a row of pixels
      * @param y row of pixels to select.
      */
@@ -111,6 +137,23 @@ class ImageBase<T extends TypedArray, C extends TypedArrayConstructor<T>> {
     set(x:number, y:number, value : number) : void {
         if( !this.checkBoundary(x,y)) throw new Error (`Invalid image coordinates set: image size ${this.width}x${this.height} pixel ${x},${y}`)
         this.pixels[y][x]= value
+    }
+
+    /**
+     * convert and copy this image in a new image.
+     * @param type outpt image type
+     * @param slope multiplication factor applied to every pixel in the conversion
+     * @param intercept intercept used for every pixel in the conversion
+     */
+    convertTo(type : ImageType, slope? : number, intercept? : number) : Image2D {
+        let dstImage = ImageFactory.Image(type, this.width, this.height)
+        let dstPixels= dstImage.imagePixels
+        if( slope !=null  && intercept != null ){
+            dstPixels.forEach((v :number,i:number)=>dstPixels[i]=slope * this.buffer[i]+intercept)
+        } else {
+            dstPixels.forEach((v :number,i:number)=>dstPixels[i]=this.buffer[i])
+        }
+        return dstImage
     }
 
     /**

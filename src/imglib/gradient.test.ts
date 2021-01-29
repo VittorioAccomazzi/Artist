@@ -6,16 +6,7 @@ import Gradient from './gradient'
 test('shall generate correct gradients', async ()=>{
     let width = 12
     let height= 11
-    let image = ImageFactory.Uint8(width,height)
-    let size = 5
-    let xStart = Math.floor((width-size)/2)
-    let yStart = Math.floor((height-size)/2)
-    for( let y=0; y<size; y++){
-        for( let x=0; x<size; x++ ){
-            image.set(xStart+x, yStart+y, 1)
-        }
-    }
-    let grad = new Gradient(image)
+    let grad = sampleImage(width, height)
 
     expect(grad.width).toBe(width)
     expect(grad.height).toBe(height)
@@ -60,6 +51,26 @@ test('shall generate correct gradients', async ()=>{
     expect(grad55[0]).toBe(0)
     expect(grad55[1]).toBe(0)
 
+})
+
+test('shall generate magnetude',()=>{
+    let width = 12
+    let height= 11
+    let grad = sampleImage(width, height)
+    let mag = grad.magnetude()
+
+    expect(mag.width).toBe(width)
+    expect(mag.height).toBe(height)
+
+    expect(mag.get(1,5)).toBe(0)
+    expect(mag.get(3,5)).toBe(4)
+    expect(mag.get(5,2)).toBe(4)
+    expect(mag.get(8,5)).toBe(4)
+    expect(mag.get(5,8)).toBe(4)
+    expect(mag.get(3,3)).toBeCloseTo(Math.sqrt(18),4)
+    expect(mag.get(7,3)).toBeCloseTo(Math.sqrt(18),4)
+    expect(mag.get(7,7)).toBeCloseTo(Math.sqrt(18),4)
+    expect(mag.get(3,7)).toBeCloseTo(Math.sqrt(18),4)
 })
 
 test('shall throw on invalid coordinate',()=>{
@@ -108,3 +119,17 @@ test('shall support all image type',()=>{
     expect(g32[0]).toBe(-3)
     expect(g32[1]).toBe(-3)
 })
+
+function sampleImage(width: number, height: number) {
+    let image = ImageFactory.Uint8(width, height)
+    let size = 5
+    let xStart = Math.floor((width - size) / 2)
+    let yStart = Math.floor((height - size) / 2)
+    for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+            image.set(xStart + x, yStart + y, 1)
+        }
+    }
+    let grad = new Gradient(image)
+    return grad
+}

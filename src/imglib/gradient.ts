@@ -1,4 +1,4 @@
-import {ImageFactory, Image2D, ImagePixels} from './imagebase'
+import {ImageFactory, Image2D, ImagePixels, ImageFloat32} from './imagebase'
 
 export default class Gradient {
     private grad : number[][][] 
@@ -18,6 +18,21 @@ export default class Gradient {
      */
     get height() : number {
         return this.grad.length
+    }
+
+    /**
+     * generate the magnnetudes of the gradients.
+     */
+    magnetude() : ImageFloat32 {
+        let mag = ImageFactory.Float32(this.width, this.height)
+        let pixels = mag.imagePixels;
+        let grad= this.grad.flat(1)
+        grad.forEach((g,i)=>{
+            let [x,y]=g
+            let mag = Math.sqrt(x*x+y*y)
+            pixels[i]=mag
+        })
+        return mag;
     }
 
     /**
