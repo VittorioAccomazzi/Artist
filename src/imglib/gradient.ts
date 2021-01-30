@@ -1,4 +1,4 @@
-import {ImageFactory, Image2D, ImagePixels, ImageFloat32} from './imagebase'
+import {ImageFactory, Image2D, ImageFloat32} from './imagebase'
 
 export default class Gradient {
     private grad : number[][][] 

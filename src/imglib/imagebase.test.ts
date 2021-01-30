@@ -1,5 +1,3 @@
-
-import { Image } from 'canvas'
 import {ImageFactory} from './imagebase'
 
 test('shall report correct image size',()=>{
