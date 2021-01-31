@@ -1,4 +1,5 @@
 import { Canvas, createCanvas, loadImage } from 'canvas';
+import {Image2D, ImageUint8} from './imagebase'
 import {imageHash} from 'image-hash'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -9,7 +10,8 @@ export const testImage1 = 'src/imglib/testimages/test1.jpg'
 export const testImage2 = 'src/imglib/testimages/test2.jpg'
 export const testImages = [ testImage1, testImage2]
 
-export async function hash( canvas : Canvas) : Promise<string> {
+export async function hash( image : Canvas | Image2D ) : Promise<string> {
+    let canvas =  isImage(image) ? toCanvas(image) : image
     let b = canvas.toBuffer('image/png');
     let name = `testImage-${canvas.width}x${canvas.height}.png`
     return new Promise((res, rej)=>{
@@ -24,17 +26,56 @@ export async function hash( canvas : Canvas) : Promise<string> {
     })
 }
 
-export async function* getCanvases() : AsyncGenerator<[Canvas, CanvasRenderingContext2D]>{
+export async function* getCanvases() : AsyncGenerator<[Canvas, CanvasRenderingContext2D, string]>{
     for( let img of testImages) {
         let image = await loadImage(img)
         let canvas= createCanvas(image.width, image.height);
         let ctx = canvas.getContext('2d')
         ctx.drawImage(image, 0, 0)
-        yield [canvas, ctx]
+        yield [canvas, ctx, path.basename(img,'.jpg')]
     }
 }
 
-export async function dumpImage(canvas : Canvas, name? : string ) : Promise<void> {
+export function toCanvas(image : Image2D) : Canvas {
+    let max = image.maxValue()
+    let min = image.minValue()
+    let img = image
+
+    if ( max > 255 || min <0 ){
+        // no need to convert
+        let range = max - min
+        let scale = range > 0 ? 254/range : 1
+        scale = Math.min(1, scale) // to not scale up.
+        let offset = -scale * min
+        img = image.convertTo('Uint8', scale, offset)
+    }  
+    let width = img.width
+    let height= img.height
+    let canvas= createCanvas(width, height)
+    let ctx = canvas.getContext('2d')
+    let data = ctx.getImageData(0,0, width, height)
+    let pixels= img.imagePixels
+    let ptr =0
+    for(let y=0; y<height; y++){
+        let yOffset = y*width
+        for( let x=0; x<width; x++){
+            let p = Math.floor(pixels[yOffset+x])
+            data.data[ptr++] = p // Red
+            data.data[ptr++] = p // Green
+            data.data[ptr++] = p // blue
+            data.data[ptr++] = 255 // alpha
+        }
+    }
+    ctx.putImageData(data,0,0)
+    return canvas
+}
+
+export async function dumpImage( image : Image2D, name? : string ){
+    let nCanvas = toCanvas(image)
+    dumpCanvas(nCanvas,name)
+}
+
+export async function dumpCanvas(canvas : Canvas, name? : string ) : Promise<void> {
     let fullname = path.resolve(tmpFolder, name ? name: (await hash(canvas)).substr(0,25))
     if( ! fs.existsSync(tmpFolder)){
         fs.mkdirSync(tmpFolder)
@@ -70,6 +111,10 @@ export async function saveCanvas( canvas : Canvas, filename : string ) : Promise
         stream.pipe(out)
         out.on('finish', () =>  res())
     })
+}
+
+function isImage( obj : any ) : obj is Image2D {
+    return obj.imagePixels != null
 }
 
 export default {}

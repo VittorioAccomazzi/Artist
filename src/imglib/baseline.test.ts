@@ -1,4 +1,4 @@
-import {testImages,hash, getCanvases, dumpImage} from './testutils'
+import {testImages,hash, getCanvases} from './testutils'
 import {loadImage} from 'canvas'
 
 test('test image shall be present', async ()=>{

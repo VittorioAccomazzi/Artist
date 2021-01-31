@@ -1,4 +1,4 @@
-import {ImageFactory, ImageUint8} from './imagebase'
+import {ImageFactory, ImageFloat32, ImageUint8} from './imagebase'
 
 export default class CanvasUtils {
 
@@ -66,6 +66,30 @@ export default class CanvasUtils {
         ctx.putImageData(data,0,0)
 
         return canvas
+    }
+
+    /**
+     * convert the input canvas in RGB
+     * @param srcImg input canvas
+     */
+    static Intensity( srcImg : HTMLCanvasElement ) : ImageFloat32 {
+        let width = srcImg.width
+        let height= srcImg.height
+        let dstImg= ImageFactory.Float32(width,height)
+        let pixels= dstImg.imagePixels
+        let ctx = srcImg.getContext('2d')
+        let data= ctx!.getImageData(0, 0, width, height)
+        let ptr =0
+        for(let p=0; p<pixels.length;p++ ){
+            let r=data.data[ptr++]
+            let g=data.data[ptr++]
+            let b=data.data[ptr++]
+            let a=data.data[ptr++]
+            // see https://en.wikipedia.org/wiki/Grayscale
+            pixels[p] = 0.299*r+0.587*g+0.114*b
+
+        }
+        return dstImg
     }
 
 }

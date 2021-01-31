@@ -33,12 +33,12 @@ export default class Histogram {
     threshold(val : number ) : number {
         if( val < 0 || val > 1 ) throw Error(`invalid histogram threshold ${val}. It shall be between 0 and 1`)
         let target = this.sum * val;
-        let s = 0 
-        let i = 0
+        let s = this.bins[0]
+        let i = 1
         while ( s < target && i<this.bins.length) {
             s+= this.bins[i]
             i++
         }
-        return i;
+        return i-1;
     }
 }

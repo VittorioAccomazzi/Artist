@@ -34,7 +34,7 @@ test('shall properly compute the thresholds',()=>{
     }
     let hist = new Histogram(image)
     expect(hist.maxValue).toBe(12)
-    expect(hist.threshold(0.5)).toBe(6)
+    expect(hist.threshold(0.5)).toBe(5)
 
 })
 

@@ -21,12 +21,19 @@ export default class Gradient {
     }
 
     /**
+     *  returns the list of gradients row major.
+     */
+    gradients() : number [][] {
+        return this.grad.flat(1)
+    }
+
+    /**
      * generate the magnnetudes of the gradients.
      */
     magnetude() : ImageFloat32 {
         let mag = ImageFactory.Float32(this.width, this.height)
         let pixels = mag.imagePixels;
-        let grad= this.grad.flat(1)
+        let grad = this.gradients()
         grad.forEach((g,i)=>{
             let [x,y]=g
             let mag = Math.sqrt(x*x+y*y)
@@ -61,10 +68,10 @@ export default class Gradient {
                 let xp = yp+x
                 let x0 = y0+x
                 let xn = yn+x
-                let gx = 2 * pixels[xp]+pixels[xp+1]+pixels[xp-1]
-                       - 2 * pixels[xn]-pixels[xn+1]-pixels[xn-1]
-                let gy = 2 * pixels[x0+1]+pixels[xn+1]+pixels[xp+1]
+                let gx = 2 * pixels[x0+1]+pixels[xn+1]+pixels[xp+1]
                        - 2 * pixels[x0-1]-pixels[xn-1]-pixels[xp-1] 
+                let gy = 2 * pixels[xp]+pixels[xp+1]+pixels[xp-1]
+                       - 2 * pixels[xn]-pixels[xn+1]-pixels[xn-1]
                 gr[y][x]=[gx,gy]
             }
         }

@@ -1,4 +1,4 @@
-import {hash, getCanvases, toHTMLCanvas, toNodeCanvas, dumpImage} from './testutils'
+import {hash, getCanvases, toHTMLCanvas, toNodeCanvas} from './testutils'
 import {ImageFactory} from './imagebase'
 import CanvasUtils from './canvasUtils'
 import GaussianFilter from './gaussianFilter'
@@ -18,11 +18,8 @@ test('check PSF for Gaussian Filter', async ()=>{
             }
         }
     
-        GaussianFilter.Run(image, kernelSize)
-        let canvas  = toNodeCanvas( CanvasUtils.Compose(image, image, image) )
-        await dumpImage( canvas, `Gaussian-psf-${kernelSize}`)
-    
-        let gHash = await hash(canvas)
+        GaussianFilter.Run(image, kernelSize)   
+        let gHash = await hash(image)
         expect(gHash).toMatchSnapshot()
     }
 })
