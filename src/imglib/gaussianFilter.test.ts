@@ -58,11 +58,11 @@ test('shall support all images types', async ()=>{
 
 test('shall match baseline hash', async()=>{
     for await ( const [canvas] of getCanvases() ) {
-        const [ red, green, blue] = CanvasUtils.Split(toHTMLCanvas(canvas)) 
+        const [ red, green, blue] = CanvasUtils.toRGB(toHTMLCanvas(canvas)) 
         GaussianFilter.Run(red, 4)
         GaussianFilter.Run(green, 4)
         GaussianFilter.Run(blue, 4)
-        const gaussian = toNodeCanvas(CanvasUtils.Compose(red, green, blue))
+        const gaussian = toNodeCanvas(CanvasUtils.fromRGB(red, green, blue))
         let hsh = await hash(gaussian)
         expect(hsh).toMatchSnapshot()
     }

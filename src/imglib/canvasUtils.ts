@@ -1,4 +1,6 @@
+import { O_TRUNC, SSL_OP_CRYPTOPRO_TLSEXT_BUG } from 'constants'
 import {ImageFactory, ImageFloat32, ImageUint8} from './imagebase'
+const assert = require('assert')
 
 export default class CanvasUtils {
 
@@ -6,7 +8,7 @@ export default class CanvasUtils {
      *  Generate the canvas's channels (red, green, blue and alpha) in separate images.
      * @param canvas 
      */
-    static Split( canvas : HTMLCanvasElement ) : [ ImageUint8, ImageUint8, ImageUint8, ImageUint8 ] {
+    static toRGB( canvas : HTMLCanvasElement ) : [ ImageUint8, ImageUint8, ImageUint8, ImageUint8 ] {
         let width = canvas.width
         let height= canvas.height
         let ctx = canvas.getContext('2d') as CanvasRenderingContext2D
@@ -40,7 +42,7 @@ export default class CanvasUtils {
      * @param imgB 
      * @param imgA 
      */
-    static Compose( imgR : ImageUint8, imgG : ImageUint8, imgB : ImageUint8, imgA? : ImageUint8 ): HTMLCanvasElement {
+    static fromRGB( imgR : ImageUint8, imgG : ImageUint8, imgB : ImageUint8, imgA? : ImageUint8 ): HTMLCanvasElement {
         let width = imgR.width
         let height= imgR.height
         let canvas = document.createElement('canvas')
@@ -69,10 +71,10 @@ export default class CanvasUtils {
     }
 
     /**
-     * convert the input canvas in RGB
+     * convert the input canvas in intensity (Gray Scale)
      * @param srcImg input canvas
      */
-    static Intensity( srcImg : HTMLCanvasElement ) : ImageFloat32 {
+    static toGrayScale( srcImg : HTMLCanvasElement ) : ImageFloat32 {
         let width = srcImg.width
         let height= srcImg.height
         let dstImg= ImageFactory.Float32(width,height)
@@ -90,6 +92,158 @@ export default class CanvasUtils {
 
         }
         return dstImg
+    }
+
+    /**
+     *  decompose the current canvas in hue, saturation and value
+     * @param image inpout canvas
+     */
+    static toHSV( image : HTMLCanvasElement ) : [ ImageFloat32, ImageFloat32, ImageFloat32] {
+        let width = image.width
+        let height= image.height
+        let hImg= ImageFactory.Float32(width,height)
+        let sImg= ImageFactory.Float32(width,height) 
+        let vImg= ImageFactory.Float32(width,height) 
+        let hPixels= hImg.imagePixels
+        let sPixels= sImg.imagePixels
+        let vPixels= vImg.imagePixels
+        let ctx = image.getContext('2d')
+        let data= ctx!.getImageData(0, 0, width, height)
+        let ptr =0
+        for(let p=0; p<width*height;p++ ){
+            let r=data.data[ptr++]
+            let g=data.data[ptr++]
+            let b=data.data[ptr++]
+            let a=data.data[ptr++]
+            let hsv = this.HSV(r/255, g/255, b/255)
+            hPixels[p]=hsv.h
+            sPixels[p]=hsv.s
+            vPixels[p]=hsv.v
+        }
+        return [hImg, sImg, vImg]    
+
+    }
+
+    /**
+     * Generate a canvas from HSV components
+     * @param hImg hue image. Float image, with values from 0 to 260
+     * @param sImg saturation image. Float image with values from 0 to 1
+     * @param vImg value image. Float image with values from 0 to 1
+     */
+    static fromHSV( hImg : ImageFloat32, sImg : ImageFloat32, vImg : ImageFloat32) : HTMLCanvasElement {
+        let width = hImg.width
+        let height= hImg.height
+        let canvas= document.createElement('canvas')
+        canvas.width = width
+        canvas.height= height
+        let ctx = canvas.getContext('2d')
+        let data= ctx!.getImageData(0, 0, width, height)
+        let hPixels = hImg.imagePixels
+        let sPixels = sImg.imagePixels
+        let vPixels = vImg.imagePixels
+        let ptr =0;
+        for( let p=0; p<width*height; p++){
+            let h = hPixels[p]
+            let s = sPixels[p]
+            let v = vPixels[p]
+            let rgb = this.RGB(h,s,v)
+            data.data[ptr++] = rgb.r * 255
+            data.data[ptr++] = rgb.g * 255
+            data.data[ptr++] = rgb.b * 255
+            data.data[ptr++] = 255
+        }
+        ctx!.putImageData(data,0,0)
+        return canvas
+    }
+    /**
+     * convert the values in HSV coordinates
+     * @param r red value in   [0,1.0]
+     * @param g green value in [0,1.0]
+     * @param b blue value in [0,1.0]
+     */
+    private static HSV( r: number, g : number, b: number  ) : { h: number, s: number, v: number } {
+        // talen from https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
+        let out = { h: 0, v:0, s: 0}
+        let min = Math.min(r,g,b)
+        let max = Math.max(r,g,b)
+        let delta = max-min
+        out.v = max;
+        if ( delta < 0.00001) {
+            out.h =0
+            out.s =0
+        } else {
+            assert(max > 0)
+            out.s = delta/max
+            if( r === max ) out.h = 0 + (g-b)/delta
+            if( g === max ) out.h = 2 + (b-r)/delta
+            if( b === max ) out.h = 4 + (r-g)/delta
+        }
+
+        out.h *= 60 // in degrees
+        if( out.h < 0 ) out.h += 360
+
+        assert(out.h >=0, `invalid hue ${out.h} with (${r},${g},${b})`)
+        assert(out.s >=0, `invalid sat ${out.s} with (${r},${g},${b})`)
+        assert(out.v >=0, `invalid val ${out.v} with (${r},${g},${b})`)
+        assert(out.h <=360, `invalid hue ${out.h} with (${r},${g},${b})`)
+        assert(out.s <=1.0, `invalid sat ${out.s} with (${r},${g},${b})`)
+        assert(out.v <=1.0, `invalid val ${out.v} with (${r},${g},${b})`)
+
+        return out
+    }
+
+    private static RGB(h:number, s:number, v:number) : {r:number, g:number, b:number} {
+        // from https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
+        let out = { r:v, g:v, b:v}
+        if( s > 0 ){
+            assert(h <= 360)
+            let hh = h / 60
+            let region = Math.floor(hh)
+            let reminder = hh - region
+            let p = v * ( 1- s )
+            let q = v * ( 1- (s * reminder))
+            let t = v * ( 1- (s * (1 - reminder)))
+            switch( region ){
+                case 0: 
+                    out.r = v
+                    out.g = t
+                    out.b = p
+                    break;
+                case 1:
+                    out.r = q
+                    out.g = v
+                    out.b = p
+                    break;
+                case 2:
+                    out.r = p
+                    out.g = v
+                    out.b = t
+                    break
+                case 3:
+                    out.r = p
+                    out.g = q
+                    out.b = v
+                    break
+                case 4:
+                    out.r = t
+                    out.g = p
+                    out.b = v
+                    break
+                default:
+                    out.r = v
+                    out.g = p
+                    out.b = q
+            }
+        }
+
+        assert(out.r >=0, `invalid red ${out.r} for (${h},${s},${v})`)
+        assert(out.g >=0, `invalid green ${out.g} for (${h},${s},${v})`)
+        assert(out.b >=0, `invalid blue ${out.b} for (${h},${s},${v})`)
+        assert(out.r <=256, `invalid red ${out.r} for (${h},${s},${v})`)
+        assert(out.g <=256, `invalid green ${out.g} for (${h},${s},${v})`)
+        assert(out.b <=256, `invalid blue ${out.b} for (${h},${s},${v})`)
+
+        return out
     }
 
 }
