@@ -14,6 +14,7 @@ import {
 import blue from "@material-ui/core/colors/blue";
 import AppVersion from './features/appVersion/appVersion'
 import AppToolbar from './features/appToolbar/appToolbar'
+import AppMain from './features/appMain/appMain'
 
 const theme = createMuiTheme({
   palette: {
@@ -38,7 +39,7 @@ createStyles({
     right: '0px',
     left:'0px',
     bottom: '0px',
-    background : 'gray',
+    background : 'white',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -53,7 +54,7 @@ const App = ({ classes }: AppProps) => (
     <div className={classes.app}>
       <AppToolbar/>
       <div className={classes.main}>
-        to do 😀
+        <AppMain />
       </div>
       <AppVersion label="version : " forkme={false} baseURL="https://github.com/VittorioAccomazzi/Artist" />
     </div>
