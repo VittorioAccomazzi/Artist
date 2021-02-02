@@ -53,8 +53,11 @@ const useStyles = makeStyles((theme) => ({
         const classes = useStyles();
         const [file, setFile] = useState<string|null>(null)
         const onDrop = useCallback((files: FileWithPath[]) => {
-            let path = URL.createObjectURL(files[0])
-            setFile(path)
+            let list = files.filter((v)=>v.path?.toLowerCase().endsWith('jpg'))
+            if( list.length > 0 ) {
+                let path = URL.createObjectURL(list[0])
+                setFile(path)
+            }
         }, [])
         const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
