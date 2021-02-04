@@ -1,5 +1,5 @@
 import React, {useState, useCallback} from 'react'
-import  Dropzone, { useDropzone } from "react-dropzone"
+import  { useDropzone } from "react-dropzone"
 import { FileWithPath } from "file-selector";
 import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
         const classes = useStyles();
         const [file, setFile] = useState<string|null>(null)
         const onDrop = useCallback((files: FileWithPath[]) => {
-            let list = files.filter((v)=>v.path?.toLowerCase().endsWith('jpg'))
+            let list = files.filter((v)=>v.path?.toLowerCase().endsWith('jpg')||v.path?.toLowerCase().endsWith('png'))
             if( list.length > 0 ) {
                 let path = URL.createObjectURL(list[0])
                 setFile(path)
