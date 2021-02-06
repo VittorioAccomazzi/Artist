@@ -46,6 +46,7 @@
   "devDependencies": {
     "canvas": "^2.6.1",
     "child-process-promise": "^2.2.1",
-    "image-hash": "^4.0.1"
+    "image-hash": "^4.0.1",
+    "comlink-loader": "^2.0.0"
   }
 }

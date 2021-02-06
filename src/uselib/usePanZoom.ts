@@ -1,6 +1,9 @@
 import React, {useState,useEffect,useRef} from 'react'
 import useMouse, {umDeviceTypes, umPoint, umMouseEvent, umTouchEvent, umButtonPress} from './useMouse'
 
+const minZoom = 0.1
+const maxZoom = 10
+
 /**
  * Listen to the mouse events and return the DOM matrix which allows to pan and zoom the content 
  * of the `targetRef`. The children of this object shall have the following CSS for  the  matrix
@@ -24,6 +27,10 @@ export default function usePanZoom( targetRef :  React.MutableRefObject<HTMLElem
         // common function
         const doPanZoom = ( dx : number, dy : number, x: number, y : number, scale : number ) => {
             let settings = DOMMatrix.fromMatrix(mat)
+
+            let cZoom = settings.a // current zoom
+            if( cZoom < minZoom ) scale = Math.max(1.0, scale )
+            if( cZoom > maxZoom ) scale = Math.min(1.0, scale )
 
             // pan
             let pan = new DOMMatrix()

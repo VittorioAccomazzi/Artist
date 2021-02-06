@@ -48,12 +48,13 @@ const useStyles = makeStyles((theme) => ({
         }
     }))
 
+    const imageExtensions = ['.jpg','.png','.jpeg']
 
     export default function AppMain(){
         const classes = useStyles();
         const [file, setFile] = useState<string|null>(null)
         const onDrop = useCallback((files: FileWithPath[]) => {
-            let list = files.filter((v)=>v.path?.toLowerCase().endsWith('jpg')||v.path?.toLowerCase().endsWith('png'))
+            let list = files.filter((file)=>imageExtensions.some((ext)=>file.path?.toLowerCase().endsWith(ext)))
             if( list.length > 0 ) {
                 let path = URL.createObjectURL(list[0])
                 setFile(path)

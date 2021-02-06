@@ -79,7 +79,6 @@ export default class CanvasUtils {
         let rPixels = imgR.imagePixels
         let gPixels = imgG.imagePixels
         let bPixels = imgB.imagePixels
-        let aPixels = imgA.imagePixels
     
         for( let p=0; p<nPixels; p++){
             rPixels[p]=cPixels[i++]
