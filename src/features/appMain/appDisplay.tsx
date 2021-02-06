@@ -20,6 +20,26 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
     const classes  = useStyles();
 
     useEffect(()=>{
+
+        const addLline = ()=>{
+            if( canvas.current != null ){
+                let ctx = canvas.current.getContext('2d')
+                if( ctx ){
+                    let width = canvas.current.width
+                    let height= canvas.current.height
+                    ctx.strokeStyle ="#FF0000"
+                    ctx.beginPath()
+                    ctx.moveTo(width*Math.random(),height*Math.random())
+                    ctx.lineTo(width*Math.random(),height*Math.random())
+                    ctx.stroke()
+                }
+            }
+        }
+        let int = window.setInterval(addLline,500)
+        return ()=>{ window.clearInterval(int)}
+    },[])
+
+    useEffect(()=>{
         if( imagePath === null ) return;
         setLoading(true)
         let img = document.createElement('img') as HTMLImageElement

@@ -1,5 +1,6 @@
 import { Canvas, createCanvas, loadImage } from 'canvas';
-import {Image2D, ImageUint8} from './imagebase'
+import {Image2D} from './imagebase'
+import CanvasUtils, {SeqCanvas} from './canvasUtils'
 import {imageHash} from 'image-hash'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -83,6 +84,12 @@ export async function dumpCanvas(canvas : Canvas, name? : string ) : Promise<voi
     await saveCanvas(canvas, fullname)
 }
 
+export function toSeqCanvas( nCanvas : Canvas ) : SeqCanvas {
+    // this is inefficient, but allows to test more code
+    let hCanvas = toHTMLCanvas(nCanvas)
+    return CanvasUtils.toSeq(hCanvas)
+}
+
 export function toHTMLCanvas(nCanvas : Canvas) : HTMLCanvasElement {
     let hCanvas = document.createElement('canvas')
     hCanvas.width = nCanvas.width
@@ -94,15 +101,26 @@ export function toHTMLCanvas(nCanvas : Canvas) : HTMLCanvasElement {
     return hCanvas
 }
 
-export function toNodeCanvas(hCanvas : HTMLCanvasElement) : Canvas {
-    let nCanvas = createCanvas(hCanvas.width,hCanvas.height)
-    let hCtx = hCanvas.getContext('2d') as CanvasRenderingContext2D
-    let nCtx = nCanvas.getContext('2d')
-    let hDat = hCtx.getImageData(0,0,nCanvas.width,nCanvas.height) 
-    nCtx?.putImageData(hDat, 0, 0)  
+export function toNodeCanvas(inCanvas : HTMLCanvasElement | SeqCanvas ) : Canvas {
+    let nCanvas = null
+    if( isSeqCanvas (inCanvas)  ) {
+        // this is more inefficient, but allows to test more code
+        let hCanvas =  document.createElement('canvas')
+        CanvasUtils.fromSeq(inCanvas,hCanvas)
+        nCanvas = toNodeCanvas(hCanvas)
+    } else {
+        nCanvas = createCanvas(inCanvas.width,inCanvas.height)
+        let nCtx = nCanvas.getContext('2d')
+        let hCtx = inCanvas.getContext('2d') as CanvasRenderingContext2D
+        let hDat = hCtx.getImageData(0,0,nCanvas.width,nCanvas.height) 
+        nCtx?.putImageData(hDat, 0, 0) 
+    }
     return nCanvas
 }
 
+function isSeqCanvas(obj : any ) : obj is SeqCanvas {
+    return obj.data != null && obj.width != null && obj.height != null && obj.data.length > 0 
+}
 
 export async function saveCanvas( canvas : Canvas, filename : string ) : Promise<void>{
     return new Promise( (res,rej)=>{

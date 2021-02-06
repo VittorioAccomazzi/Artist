@@ -1,4 +1,4 @@
-import {hash, getCanvases, toHTMLCanvas, toNodeCanvas} from './testutils'
+import {hash, getCanvases, toSeqCanvas, toNodeCanvas} from './testutils'
 import {ImageFactory} from './imagebase'
 import CanvasUtils from './canvasUtils'
 import GaussianFilter from './gaussianFilter'
@@ -58,7 +58,7 @@ test('shall support all images types', async ()=>{
 
 test('shall match baseline hash', async()=>{
     for await ( const [canvas] of getCanvases() ) {
-        const [ red, green, blue] = CanvasUtils.toRGB(toHTMLCanvas(canvas)) 
+        const [ red, green, blue] = CanvasUtils.toRGB(toSeqCanvas(canvas)) 
         GaussianFilter.Run(red, 4)
         GaussianFilter.Run(green, 4)
         GaussianFilter.Run(blue, 4)
