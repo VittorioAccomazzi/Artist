@@ -10,7 +10,6 @@ interface TypedArrayConstructor<T extends TypedArray> {
     new (buffer: ArrayBuffer, byteOffset?: number, length?: number): T;
 }
 
-
 export type ImageUint8  = ImageBase<Uint8Array,Uint8ArrayConstructor>
 export type ImageUint16 = ImageBase<Uint16Array,Uint16ArrayConstructor>
 export type ImageFloat32= ImageBase<Float32Array,Float32ArrayConstructor>
@@ -21,6 +20,11 @@ export type ImageFloat32= ImageBase<Float32Array,Float32ArrayConstructor>
 export type Image2D = ImageUint8 | ImageUint16 | ImageFloat32
 export type ImagePixels = Uint8Array | Uint16Array | Float32Array
 export type ImageType = 'Uint8' | 'Uint16' | 'Float32'
+
+
+export function isImage( obj : any ) : obj is Image2D {
+    return obj.imagePixels != null
+}
 
 export class ImageFactory {
 

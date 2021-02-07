@@ -27,14 +27,18 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
         setLoading(true)
         let img = document.createElement('img') as HTMLImageElement
         img.onload = (e) => {
-            if( canvas.current != null ){
-                if( worker.current != null ) worker.current.stop()
-                worker.current = new ForeWorker(img, canvas.current)
-                worker.current.start()
-                setLoading(false)
-            } else {
-                console.error(`canvas null when image received. THIS SHOULD NOT HAPPEN`)
+            const startWorker = () =>{
+                if( canvas.current){
+                    worker.current = new ForeWorker(img, canvas.current)
+                    worker.current.start()
+                    setLoading(false)
+                } else {
+                    console.error(`canvas null when image received. THIS SHOULD NOT HAPPEN`)
+                }
+                
             }
+            if( worker.current != null )  worker.current.stop().then(startWorker)
+            else startWorker()
         }
         img.src= imagePath
     },[imagePath,canvas])

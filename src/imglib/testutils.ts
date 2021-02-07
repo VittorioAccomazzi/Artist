@@ -1,9 +1,11 @@
 import { Canvas, createCanvas, loadImage } from 'canvas';
-import {Image2D} from './imagebase'
+import {Image2D, isImage} from './imagebase'
+import Histogram from './histogram'
 import CanvasUtils, {SeqCanvas} from './canvasUtils'
 import {imageHash} from 'image-hash'
 import * as fs from 'fs'
 import * as path from 'path'
+import { createTextChangeRange } from 'typescript';
 
 
 export const tmpFolder = 'tmp'
@@ -122,7 +124,7 @@ function isSeqCanvas(obj : any ) : obj is SeqCanvas {
     return obj.data != null && obj.width != null && obj.height != null && obj.data.length > 0 
 }
 
-export async function saveCanvas( canvas : Canvas, filename : string ) : Promise<void>{
+async function saveCanvas( canvas : Canvas, filename : string ) : Promise<void>{
     return new Promise( (res,rej)=>{
         const out = fs.createWriteStream(`${filename}.png`)
         const stream = canvas.createPNGStream()
@@ -131,8 +133,26 @@ export async function saveCanvas( canvas : Canvas, filename : string ) : Promise
     })
 }
 
-function isImage( obj : any ) : obj is Image2D {
-    return obj.imagePixels != null
+const maxHeight = 512
+export  function displayHisto(histo : Histogram ) : Canvas {
+    let maxVal= histo.maxValue
+    let bins  = histo.histogramBins
+    let scale = Math.min( 1, maxHeight/maxVal)
+    let width = bins.length
+    let height= Math.floor(scale*maxVal)
+    let canvas = createCanvas(width,height)
+    let ctx = canvas.getContext('2d')
+    ctx.fillStyle="#FFFFFFFF"
+    ctx.fillRect(0,0,width,height)
+    ctx.strokeStyle="#0000FFFF"
+    ctx.beginPath()
+    bins.forEach((v,i)=>{
+        let scaled = Math.floor(v * scale)
+        ctx.moveTo(i,height)
+        ctx.lineTo(i,height-scaled)
+    })
+    ctx.stroke()
+    return canvas
 }
 
 export default {}

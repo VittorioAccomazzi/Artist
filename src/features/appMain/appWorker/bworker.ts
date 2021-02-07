@@ -1,5 +1,5 @@
 import {SeqCanvas} from '../../../imglib/canvasUtils'
-
+import Painter from './painter'
 export type BackWorkerClassConstructors = { new (inCanvas : SeqCanvas): BackWorker }
 
 /**
@@ -8,31 +8,20 @@ export type BackWorkerClassConstructors = { new (inCanvas : SeqCanvas): BackWork
  */
 export default class BackWorker {
 
-    private canvas : SeqCanvas | null = null
+    private worker : Painter | null = null
 
     constructor( inCanvas : SeqCanvas ){
-        this.canvas = inCanvas
+        this.worker = new Painter(inCanvas)
     }
 
     async next() {
-        let canvas = this.canvas
-        if( this.canvas ){
-            this.fade()
-            canvas = this.canvas
-            if ( this.canvas!.data.every((v)=>v===0) ){
-                // we are done, is all blank
-                this.canvas = null
-            }
-        }
-        return canvas
+        let image = null
+        if( this.worker ) image = this.worker.next()
+        return image
     }
 
     async stop(){
-        this.canvas = null
-    }
-
-    private fade() {
-        this.canvas!.data.forEach((v,i)=>v > 0 ? this.canvas!.data[i]=v-1 : 0 )
+        this.worker = null
     }
 
 }

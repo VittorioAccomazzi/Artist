@@ -5,16 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug image quantization",
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/start",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ]
-        }
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
+            "args": ["test", "imageQuantization.test.ts", "--runInBand", "--no-cache", "--no-watch"],
+            "cwd": "${workspaceRoot}",
+            "protocol": "inspector",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+              "CI": "true"
+            }
+          }
     ]
 }

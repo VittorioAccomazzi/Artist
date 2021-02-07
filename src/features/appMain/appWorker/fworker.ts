@@ -41,22 +41,24 @@ export default class ForeWorker {
 
         const doWork = async () => {
             this.timer  = null
-            if( this.bworker == null && this.canvas ){
-                // start
-                let seqCanvas = CanvasUtil.toSeq(this.canvas)
-                this.bworker  = await new BackWorkerFactory.default(seqCanvas)
-            }
-            const sCanvas= await this.bworker!.next() // do work !
-            if( sCanvas && this.canvas){
-                CanvasUtil.fromSeq(sCanvas, this.canvas)
-                this.timer  = window.setTimeout(doWork, timerSpeed) // continue the work
-            }
-            if( sCanvas == null) {
-                console.log('Done !!')
+            if( this.canvas) {
+                if( this.bworker == null  ){
+                    // start
+                    let seqCanvas = CanvasUtil.toSeq(this.canvas)
+                    this.bworker  = await new BackWorkerFactory.default(seqCanvas)
+                }
+                const sCanvas= await this.bworker!.next() // do work !
+                if( sCanvas ){
+                    CanvasUtil.fromSeq(sCanvas, this.canvas)
+                    this.timer  = window.setTimeout(doWork, timerSpeed) // continue the work
+                }
+                if( sCanvas == null) {
+                    console.log('Done !!')
+                }
             }
         }
         if( this.timer != null ) window.clearTimeout(this.timer)
-       this.timer  = window.setTimeout(doWork, timerSpeed)
+        this.timer  = window.setTimeout(doWork, timerSpeed)
     } 
 
     async stop(){

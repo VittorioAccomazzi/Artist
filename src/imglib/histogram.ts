@@ -1,15 +1,23 @@
-import {ImageFactory, Image2D, ImageFloat32, ImageUint16, ImageUint8} from './imagebase'
+
+import {ImageUint16, ImageUint8, isImage} from './imagebase'
 
 export default class Histogram {
     private bins : number[]
     private sum : number =0
 
-    constructor( inImage : ImageUint16 | ImageUint8) {
-        let max = inImage.maxValue()
-        let pixels = inImage.imagePixels;
-        this.sum = pixels.length // number of bins in the histogram.
-        this.bins = Array(max+1).fill(0)
-        pixels.forEach((v:number)=>this.bins[v]++)
+    constructor( inBins : number []  )
+    constructor( inImage : ImageUint16 | ImageUint8)
+    constructor( inData : ImageUint16 | ImageUint8 | number []) {
+        if( isImage( inData )){
+            let max = inData.maxValue()
+            let pixels = inData.imagePixels;
+            this.sum = pixels.length // number of bins in the histogram.
+            this.bins = Array(max+1).fill(0)
+            pixels.forEach((v:number)=>this.bins[v]++)
+        } else {
+            this.bins = inData 
+            this.sum = inData.reduce((sum, v)=>sum+v,0)
+        }
     }
 
     /**
@@ -27,7 +35,7 @@ export default class Histogram {
     }
 
     /**
-     * 
+     *  genetrate the threshold of histogram's intensity based on persetages
      * @param val persentage of the histogram
      */
     threshold(val : number ) : number {
@@ -41,4 +49,8 @@ export default class Histogram {
         }
         return i-1;
     }
+}
+
+export function isHistogram( obj : any ) : obj is Histogram {
+    return obj.bins != null && obj.sum > 0
 }

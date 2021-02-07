@@ -72,7 +72,6 @@ export default class CanvasUtils {
         let imgR= ImageFactory.Uint8(width,height)
         let imgG= ImageFactory.Uint8(width,height)
         let imgB= ImageFactory.Uint8(width,height)
-        let imgA= ImageFactory.Uint8(width,height)
         let nPixels = width*height
         let i =0
         let cPixels = canvas.data
