@@ -35,7 +35,7 @@ test('shall decompose in HSV-1',()=>{
     ctx.fillRect(0,height/2,width/2,height/2)
     ctx.fillStyle="#A0FF00"
     ctx.fillRect(width/2,0,width/2,height/2)
-    dumpCanvas(canvas,'test')
+    //dumpCanvas(canvas,'test')
     const [hImg, sImg, vImg] = CanvasUtils.toHSV(toSeqCanvas(canvas))
 
     // using https://www.rapidtables.com/convert/color/rgb-to-hsv.html
@@ -82,9 +82,9 @@ test('shall decompose in HSV-2',async ()=>{
         expect(hhsh).toMatchSnapshot()
         expect(shsh).toMatchSnapshot()
         expect(vhsh).toMatchSnapshot()
-        await dumpImage(h8bit,`hue-${name}`)
-        await dumpImage(s8bit,`sat-${name}`)
-        await dumpImage(v8bit,`val-${name}`)
+        //await dumpImage(h8bit,`hue-${name}`)
+        //await dumpImage(s8bit,`sat-${name}`)
+        //await dumpImage(v8bit,`val-${name}`)
     }
 })
 

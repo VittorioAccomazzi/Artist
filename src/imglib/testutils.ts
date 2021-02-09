@@ -134,7 +134,7 @@ async function saveCanvas( canvas : Canvas, filename : string ) : Promise<void>{
 }
 
 const maxHeight = 512
-export  function displayHisto(histo : Histogram ) : Canvas {
+export  function displayHisto(histo : Histogram , cMap? : string []) : Canvas {
     let maxVal= histo.maxValue
     let bins  = histo.histogramBins
     let scale = Math.min( 1, maxHeight/maxVal)
@@ -144,14 +144,15 @@ export  function displayHisto(histo : Histogram ) : Canvas {
     let ctx = canvas.getContext('2d')
     ctx.fillStyle="#FFFFFFFF"
     ctx.fillRect(0,0,width,height)
-    ctx.strokeStyle="#0000FFFF"
-    ctx.beginPath()
     bins.forEach((v,i)=>{
+        let col =  cMap ? cMap[i] : "#0000FFFF"
+        ctx.beginPath()
+        ctx.strokeStyle= col
         let scaled = Math.floor(v * scale)
         ctx.moveTo(i,height)
         ctx.lineTo(i,height-scaled)
+        ctx.stroke()
     })
-    ctx.stroke()
     return canvas
 }
 

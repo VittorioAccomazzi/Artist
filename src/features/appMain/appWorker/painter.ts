@@ -4,10 +4,7 @@ import CanvasUtil from '../../../imglib/canvasUtils'
 import ImageQuantization from '../../../imglib/imageQuantization'
 import {ImageUint16} from '../../../imglib/imagebase'
 
-const numSteps = 20
-const sSlope = 1.0
-const eSlope = 1.6
-const offset = 0.6
+const numSteps = 1
 
 export default class Painter {
 
@@ -25,25 +22,22 @@ export default class Painter {
         if (this.step < numSteps) {
             this.step ++
 
-            let hStep = (8 - Math.round(4* this.step/numSteps))
-            let vStep = (8 - Math.round(4* this.step/numSteps))
-            let sStep = (10- Math.round(8* this.step/numSteps))
-            let mStep = (8 - Math.round(3* this.step/numSteps))
+            let vStep = 6
+            let sStep = 4
 
-            let hImage = this.Quantize(this.hImage!, hStep, mStep)
-            let vImage = this.Quantize(this.vImage!, vStep, mStep)
-            let sImage = this.Quantize(this.sImage!, sStep, mStep)
+            let vImage = this.Quantize(this.vImage!, vStep )
+            let sImage = this.Quantize(this.sImage!, sStep )
 
-            outCanvas = CanvasUtil.fromHSV(hImage, sImage, vImage)
+            outCanvas = CanvasUtil.fromHSV(this.hImage!, sImage!, vImage!)
         }
         return outCanvas
     }
 
-    private  Quantize( inImage : ImageFloat32, hKernelMax : number, hKenerlMedian : number ) : ImageFloat32 {
+    private  Quantize( inImage : ImageFloat32, hKenerlMedian : number ) : ImageFloat32 {
         let imgMax = inImage.maxValue()
         let trgMax = Math.max(256,imgMax)
         let image16 : ImageUint16 = inImage.convertTo('Uint16', trgMax/imgMax,0) as ImageUint16
-        ImageQuantization.Run(image16, hKernelMax, hKenerlMedian)
+        ImageQuantization.Run(image16, hKenerlMedian)
         return image16.convertTo('Float32', imgMax/trgMax,0) as ImageFloat32
     }
 

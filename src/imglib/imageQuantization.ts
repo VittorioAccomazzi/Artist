@@ -1,6 +1,7 @@
 import Histogram from './histogram'
 import {ImageUint16, ImageUint8} from './imagebase'
 import MedianFilter from './medianFilter'
+import AverageFilter from './averageFilter'
 
 const noValue = -1 
 
@@ -9,20 +10,20 @@ export default class ImageQuantization {
     /**
      * Simple quantization method looking at the peak in the histogram.
      * @param image input image. It will be quantized *in place*
-     * @param hKernelMax half of the kernel size for detering the maxium. Larger the number more quantized is the image
      * @param hKenerlMedian half of the median lernel applied to the histogram for smoothing.
      */
-    static Run( image : ImageUint16 | ImageUint8, hKernelMax :  number =1, hKenerlMedian : number  =5 ){
+    static Run( image : ImageUint16 | ImageUint8, hKenerlMedian : number  =5 ){
         let oHist = new Histogram(image)
-        let fHist = MedianFilter.Run(oHist,hKenerlMedian)
-        let map = this.mapToMaxima(oHist, fHist, hKernelMax)
+        let mHist = MedianFilter.Run(oHist,hKenerlMedian)
+        let fHist = AverageFilter.Run(mHist,hKenerlMedian)
+        let map = this.mapToMaxima(oHist, fHist)
         let pixels = image.imagePixels
         pixels.forEach((val:number, index:number)=>pixels[index]=map[val])
     }
 
-    private static mapToMaxima( oHist : Histogram, fHist : Histogram, hSize : number  ) : number [] { 
+    private static mapToMaxima( oHist : Histogram, fHist : Histogram ) : number [] { 
         let bins = fHist.histogramBins
-        let maximas : number [] =   ImageQuantization.findMaxima(bins, hSize)
+        let maximas : number [] =   ImageQuantization.findMaxima(bins)
         let remap : number [] = Array(oHist.histogramBins.length).fill(noValue)
 
         // for each maxima find the cluster
@@ -80,17 +81,25 @@ export default class ImageQuantization {
         return [ Math.max(0,start), Math.min( bins.length-1, end ) ]
     }
 
-    private static findMaxima(bins: number[], hSize: number) {
+    private static findMaxima(bins: number[]) {
         let maximas: number[] = []
-        bins.forEach((val, index) => {
-            let isMax = true
-            for (let i = index - hSize; i <= index + hSize; i++) {
-                if (i >= 0 && i < bins.length)
-                    isMax = isMax && (val >= bins[i])
-            }
-            if (isMax && val > 0)
-                maximas.push(index)
-        })
+        for( let i=0; i<bins.length;i++){
+            let lIsMax = this.follow(bins, i, -1)
+            let rIsMax = this.follow(bins, i, 1 )
+            if( lIsMax && rIsMax ) maximas.push(i)
+        }
         return maximas
+    }
+
+    private static follow( bins : number [], index : number, dir : number  ) : boolean {
+        let val = bins[index]
+        let idx = index + dir
+
+        while( idx >=0 && idx < bins.length ){
+            if( bins[idx] < val ) return true
+            if( bins[idx] > val ) return false
+            idx += dir
+        }
+        return true
     }
 }
