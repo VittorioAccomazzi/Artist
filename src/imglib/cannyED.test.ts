@@ -40,7 +40,7 @@ test('shall find edges on real images',async ()=>{
 test('shall find edges on filtered images',async ()=>{
     for await ( const [canvas,ctx,name] of getCanvases() ) {
         let int = CanvasUtils.toGrayScale(toSeqCanvas(canvas))
-        let flt = GaussianFilter.Run(int,2.0)
+        GaussianFilter.Run(int,2.0)
         let canny = CannyEdgeDetection.Detect(int, 0.98, 0.99)
         //await dumpImage(canny,`canny-filt-${name}`)
         let hsh = await hash(canny)

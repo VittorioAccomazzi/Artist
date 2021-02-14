@@ -28,7 +28,7 @@ export default class Histogram {
     }
 
     /**
-     * max histtogram value
+     * max histogram value
      */
     get maxValue(){
         return this.bins.reduce((m,v)=>Math.max(m,v),0)

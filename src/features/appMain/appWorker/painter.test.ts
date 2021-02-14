@@ -2,7 +2,7 @@ import Painter from './painter'
 import { dumpCanvas, getCanvases, toSeqCanvas, hash, toNodeCanvas } from '../../../imglib/testutils'
 import {SeqCanvas} from '../../../imglib/canvasUtils'
 
-test('Painter quality validation', async ()=>{
+xtest('Painter quality validation', async ()=>{
     const medianKernerl = 5
     for await ( const [canvas,ctx,name] of getCanvases() ) {
         let  sCanvas : SeqCanvas | null = toSeqCanvas(canvas)

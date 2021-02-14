@@ -156,7 +156,7 @@ export default class CanvasUtils {
             let r=data[ptr++]
             let g=data[ptr++]
             let b=data[ptr++]
-            let hsv = this.HSV(r/255, g/255, b/255)
+            let hsv = this.Rgb2Hsv(r/255, g/255, b/255)
             hPixels[p]=hsv.h
             sPixels[p]=hsv.s
             vPixels[p]=hsv.v
@@ -183,20 +183,21 @@ export default class CanvasUtils {
             let h = hPixels[p]
             let s = sPixels[p]
             let v = vPixels[p]
-            let rgb = this.RGB(h,s,v)
+            let rgb = this.Hsv2Rgb(h,s,v)
             data[ptr++] = rgb.r * 255
             data[ptr++] = rgb.g * 255
             data[ptr++] = rgb.b * 255
         }
         return canvas
     }
+
     /**
      * convert the values in HSV coordinates
      * @param r red value in   [0,1.0]
      * @param g green value in [0,1.0]
      * @param b blue value in [0,1.0]
      */
-    private static HSV( r: number, g : number, b: number  ) : { h: number, s: number, v: number } {
+    private static Rgb2Hsv( r: number, g : number, b: number  ) : { h: number, s: number, v: number } {
         // talen from https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
         let out = { h: 0, v:0, s: 0}
         let min = Math.min(r,g,b)
@@ -227,7 +228,7 @@ export default class CanvasUtils {
         return out
     }
 
-    private static RGB(h:number, s:number, v:number) : {r:number, g:number, b:number} {
+    private static Hsv2Rgb(h:number, s:number, v:number) : {r:number, g:number, b:number} {
         // from https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
         let out = { r:v, g:v, b:v}
         if( s > 0 ){
@@ -279,6 +280,100 @@ export default class CanvasUtils {
         assert(out.b <=256, `invalid blue ${out.b} for (${h},${s},${v})`)
 
         return out
+    }
+
+    /**
+     * convert the input canvas, assumed to be un RGB space, in to LAB
+     * components using Observer= 2°, Illuminant= D65
+     * @param image input image
+     */
+    static toLab(image : SeqCanvas ) : [ ImageFloat32, ImageFloat32, ImageFloat32] {
+        let width = image.width
+        let height= image.height
+        let lImg= ImageFactory.Float32(width,height)
+        let aImg= ImageFactory.Float32(width,height) 
+        let bImg= ImageFactory.Float32(width,height) 
+        let lPixels= lImg.imagePixels
+        let aPixels= aImg.imagePixels
+        let bPixels= bImg.imagePixels
+        let data= image.data
+        let ptr =0
+        for(let p=0; p<width*height;p++ ){
+            let r=data[ptr++]
+            let g=data[ptr++]
+            let b=data[ptr++]
+            let lab = this.Rgb2Lab(r/255, g/255, b/255)
+            lPixels[p]=lab.l
+            aPixels[p]=lab.a
+            bPixels[p]=lab.b
+        }
+        return [lImg, aImg, bImg]    
+    }
+
+    static fromLab( lImg : ImageFloat32, aImg : ImageFloat32, bImg : ImageFloat32) : SeqCanvas {
+        let width = lImg.width
+        let height= lImg.height
+        let canvas= { width, height, data : new Uint8Array(width*height*3)}
+        let data = canvas.data
+        let lPixels = lImg.imagePixels
+        let aPixels = aImg.imagePixels
+        let bPixels = bImg.imagePixels
+        let ptr =0;
+        for( let p=0; p<width*height; p++){
+            let l = lPixels[p]
+            let a = aPixels[p]
+            let b = bPixels[p]
+            let rgb = this.Lab2Rgb(l,a,b)
+            data[ptr++] = rgb.r * 255
+            data[ptr++] = rgb.g * 255
+            data[ptr++] = rgb.b * 255
+        }
+        return canvas
+    }
+    
+    // Taken from https://github.com/antimatter15/rgb-lab/blob/master/color.js
+    // which in turns is taken from the heavily referenced web site :
+    // https://www.easyrgb.com/en/math.php
+    static Rgb2Lab(r: number, g: number, b: number) : { l: number, a:number, b:number } {
+  
+        r = (r > 0.04045) ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
+        g = (g > 0.04045) ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
+        b = (b > 0.04045) ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
+    
+        let x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047;
+        let y = (r * 0.2126 + g * 0.7152 + b * 0.0722) / 1.00000;
+        let z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883;
+    
+        x = (x > 0.008856) ? Math.pow(x, 1/3) : (7.787 * x) + 16/116;
+        y = (y > 0.008856) ? Math.pow(y, 1/3) : (7.787 * y) + 16/116;
+        z = (z > 0.008856) ? Math.pow(z, 1/3) : (7.787 * z) + 16/116;
+    
+        return { l : (116 * y) - 16, a: 500 * (x - y), b: 200 * (y - z) }
+    }
+    static Lab2Rgb(l: number, a: number, b: number) {
+        let y = (l + 16) / 116
+        let x = a / 500 + y
+        let z = y - b / 200
+  
+        x = 0.95047 * ((x * x * x > 0.008856) ? x * x * x : (x - 16/116) / 7.787);
+        y = 1.00000 * ((y * y * y > 0.008856) ? y * y * y : (y - 16/116) / 7.787);
+        z = 1.08883 * ((z * z * z > 0.008856) ? z * z * z : (z - 16/116) / 7.787);
+
+        let rgb = {
+            r : x *  3.2406 + y * -1.5372 + z * -0.4986,
+            g : x * -0.9689 + y *  1.8758 + z *  0.0415,
+            b : x *  0.0557 + y * -0.2040 + z *  1.0570
+        }
+    
+        rgb.r = (rgb.r > 0.0031308) ? (1.055 * Math.pow(rgb.r, 1/2.4) - 0.055) : 12.92 * rgb.r;
+        rgb.g = (rgb.g > 0.0031308) ? (1.055 * Math.pow(rgb.g, 1/2.4) - 0.055) : 12.92 * rgb.g;
+        rgb.b = (rgb.b > 0.0031308) ? (1.055 * Math.pow(rgb.b, 1/2.4) - 0.055) : 12.92 * rgb.b;
+
+        rgb.r = Math.max(0, Math.min(1,rgb.r))
+        rgb.g = Math.max(0, Math.min(1,rgb.g))
+        rgb.b = Math.max(0, Math.min(1,rgb.b))
+
+        return rgb
     }
 
 }

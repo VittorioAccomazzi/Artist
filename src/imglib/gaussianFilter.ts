@@ -21,7 +21,11 @@ export default class GaussianFilter {
 
     }
 
-     private static buildKernel(sigma : number ) : number [] {
+    /**
+     * generate a 1D Gaussian kernel where the central location is the poxition for x=0
+     * @param sigma standard deviation
+     */
+     static buildKernel(sigma : number ) : number [] {
           // Choose a kernel radius such that the gaussian is down to about ~0.1 at the kernel edges
          let kernelRadius = Math.ceil(1.5 * sigma)
          kernelRadius = kernelRadius < 1 ? 1 : kernelRadius
