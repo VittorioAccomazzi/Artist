@@ -1,7 +1,6 @@
 const assert = require('assert')
-import { skipPartiallyEmittedExpressions } from 'typescript'
 import GaussianFilter from './gaussianFilter'
-import {ImageFactory, Image2D, ImagePixels} from './imagebase'
+import {Image2D} from './imagebase'
 
 export default class BilateralFilter {
 
