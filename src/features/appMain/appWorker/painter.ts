@@ -6,8 +6,8 @@ import DifferenceOfGaussian from '../../../imglib/dogFilter'
 import GradientQuantization from '../../../imglib/gradientQuantization'
 
 const numSteps = 5
-const scaleStd = 3
-const rangeStd = 4
+const scaleStd = 4
+const rangeStd = 5
 const scaleDog = 2
 
 export default class Painter {
@@ -41,14 +41,14 @@ export default class Painter {
     }
 
     private luminosityQuantization(){
-        let binSize=8
+        let binSize=12
         let smoothenss = 1
         GradientQuantization.Run(this.lImage!, binSize, smoothenss) 
     }
 
     private generateDog() {
-        let sSigma = 2
-        let lSigma = Math.sqrt(1.6) * sSigma
+        let sSigma = 1
+        let lSigma = 1.6 * sSigma
         let sensitivity = 0.98
         let sharpness = 3
         this.dImage = DifferenceOfGaussian.Run( this.lImage!, sSigma, lSigma, sensitivity, sharpness)
