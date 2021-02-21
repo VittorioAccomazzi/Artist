@@ -38,7 +38,7 @@ test('shall detect edges on Luminosity component ', async()=>{
         const [ inL ] = CanvasUtils.toLab(toSeqCanvas(canvas)) 
 
         let sSigma = 2
-        let lSigma = Math.sqrt(1.6) * sSigma
+        let lSigma = 1.6 * sSigma
         let sensitivity = 0.98
         let sharpness = 1
         let dogImage = DifferenceOfGaussian.Run( inL, sSigma, lSigma, sensitivity, sharpness)
@@ -46,6 +46,6 @@ test('shall detect edges on Luminosity component ', async()=>{
         let hsh = await hash(scaledDog)
         expect(hsh).toMatchSnapshot()
     
-        // await dumpImage(scaledDog, `dog edges on ${name}`)
+         //await dumpImage(scaledDog, `dog edges on ${name}`)
     }
 })
