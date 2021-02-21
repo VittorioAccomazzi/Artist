@@ -20,7 +20,7 @@ test('shall  generate orthogonal tensors',()=>{
         image.set(x,y,high)
     }
 
-    let tf = TensorGenerator.Run(image, 1)
+    let tf = TensorGenerator.Run(image, image, image, 1)
 
     tf.fieldTensors.forEach( ({majVec, minVec, majVal, minVal}) =>{
        let dot = majVec[0]*minVec[0]+majVec[1]*minVec[1]
@@ -49,7 +49,7 @@ test('shall detect edge orientation',async()=>{
         }
     }
 
-    let tf = TensorGenerator.Run(image, 1)
+    let tf = TensorGenerator.Run(image, image, image, 1)
 
     // horizontal tensor
     let hTensor = tf.get(xOff+nx/2,yOff)
@@ -103,7 +103,7 @@ test('shall compute eigen values correctly',async()=>{
     }
 
     //await dumpImage(image,`checkboard`)
-    let tf = TensorGenerator.Run(image, 1) 
+    let tf = TensorGenerator.Run(image, image, image, 1) 
 
     let minImage = ImageFactory.Float32(width,height)
     let majImage = ImageFactory.Float32(width,height)
@@ -127,12 +127,12 @@ test('shall compute eigen values correctly',async()=>{
 test('shall find the local image variation',async()=>{
     const medianKernerl = 5
     for await ( const [canvas,ctx,name] of getCanvases() ) {
-        let [lImg] = CanvasUtils.toLab(toSeqCanvas(canvas))
+        let [lImg, aImg, bImg] = CanvasUtils.toLab(toSeqCanvas(canvas))
         
-        let tf = TensorGenerator.Run(lImg, 1) 
+        let tf = TensorGenerator.Run(lImg, aImg, bImg, 1) 
 
-        let tfCanvas = overlayTensor(lImg, tf)
-        let tgCanvas = overlayTangent(lImg, tf)
+        let tfCanvas = overlayTensor(canvas, tf)
+        let tgCanvas = overlayTangent(canvas, tf)
 
         let hsh1 = await hash( tfCanvas)
         expect(hsh1).toMatchSnapshot()
@@ -140,8 +140,8 @@ test('shall find the local image variation',async()=>{
         let hsh2 = await hash( tgCanvas)
         expect(hsh2).toMatchSnapshot()
 
-        //await dumpCanvas(tfCanvas,`tensor field canvas ${name}`) 
-        //await dumpCanvas(tgCanvas,`tangent field canvas ${name}`) 
+        // await dumpCanvas(tfCanvas,`tensor field canvas ${name}`) 
+        // await dumpCanvas(tgCanvas,`tangent field canvas ${name}`) 
     }
 },2*60*1000)
 

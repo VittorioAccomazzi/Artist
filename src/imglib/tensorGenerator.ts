@@ -6,13 +6,13 @@ import GaussianFilter from './gaussianFilter'
 
 export default class TensorGenerator {
 
-    static Run( image : Image2D, sigma : number ) : TensorField {
-        const [dx2, dy2, dxy]= this.filterComponents(image, sigma)
+    static Run( c1 : Image2D, c2 : Image2D, c3 : Image2D, sigma : number ) : TensorField {
+        const [dx2, dy2, dxy]= this.filterComponents(c1, c2, c3, sigma)
 
         // https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect6.pdf slide 21 and 22
         // notice that the major eigenvectors are computed a descibed in 
-        let width = image.width
-        let height= image.height
+        let width = c1.width
+        let height= c1.height
         let tensors : tensor[] = Array<tensor>(width*height).fill(zeroTensor).map((i, index )=>{
             let x2 = dx2.imagePixels[index]
             let y2 = dy2.imagePixels[index]
@@ -36,19 +36,25 @@ export default class TensorGenerator {
     }
 
 
-    private static filterComponents(image : Image2D, sigma : number) : [ImageFloat32, ImageFloat32, ImageFloat32] {
+    private static filterComponents(c1 : Image2D, c2 : Image2D, c3: Image2D, sigma : number) : [ImageFloat32, ImageFloat32, ImageFloat32] {
         // Wiki https://en.wikipedia.org/wiki/Structure_tensor
-        let grad = new Gradient( image )
-        let xComp = ImageFactory.Float32(grad.width, grad.height)
-        let yComp = ImageFactory.Float32(grad.width, grad.height)
-        let xyComp= ImageFactory.Float32(grad.width, grad.height)
-        let grPixels= grad.gradients()
+        let c1Grad = new Gradient( c1 )
+        let c2Grad = new Gradient( c2 )
+        let c3Grad = new Gradient( c3 )
+        let width = c1.width
+        let height= c2.height
+        let xComp = ImageFactory.Float32(width, height)
+        let yComp = ImageFactory.Float32(width, height)
+        let xyComp= ImageFactory.Float32(width, height)
+        let c1Pixels= c1Grad.gradients()
+        let c2Pixels= c2Grad.gradients()
+        let c3Pixels= c3Grad.gradients()
         let xPixels = xComp.imagePixels
         let yPixels = yComp.imagePixels
         let xyPixels= xyComp.imagePixels
-        xPixels.forEach((v,i)=>xPixels[i]=grPixels[i][0] * grPixels[i][0])
-        yPixels.forEach((v,i)=>yPixels[i]=grPixels[i][1] * grPixels[i][1])
-        xyPixels.forEach((v,i)=>xyPixels[i]=grPixels[i][0] * grPixels[i][1])
+        xPixels.forEach((v,i)=>xPixels[i]=c1Pixels[i][0] * c1Pixels[i][0] + c2Pixels[i][0] * c2Pixels[i][0] + c3Pixels[i][0] * c3Pixels[i][0])
+        yPixels.forEach((v,i)=>yPixels[i]=c1Pixels[i][1] * c1Pixels[i][1] + c2Pixels[i][1] * c2Pixels[i][1] + c3Pixels[i][1] * c3Pixels[i][1])
+        xyPixels.forEach((v,i)=>xyPixels[i]=c1Pixels[i][0] * c1Pixels[i][1] + c2Pixels[i][0] * c2Pixels[i][1] + c3Pixels[i][0] * c3Pixels[i][1])
         GaussianFilter.Run(xComp,sigma)
         GaussianFilter.Run(yComp,sigma)
         GaussianFilter.Run(xyComp,sigma)

@@ -288,18 +288,10 @@ export function randomPoints( width : number, height : number ) : {x:number, y:n
     return points
 }
 
-export function overlayTensor( image : Image2D, tf : TensorField, size : number =2 ) : Canvas {
+export function overlayTensor( canvas : Canvas, tf : TensorField, size : number =2 ) : Canvas {
     let mag = 2*size+1
-    let width = image.width
-    let height= image.height
-
-    // normalize the image
-    let max = image.maxValue()
-    let min = image.minValue()
-    let scale = 254/(max-min)
-    let offset= -scale*min
-    let grayScale = image.convertTo('Uint8', scale, offset) as ImageUint8
-    let grayImage = toNodeCanvas(CanvasUtils.fromRGB(grayScale, grayScale, grayScale))
+    let width = canvas.width
+    let height= canvas.height
     let outCanvas = createCanvas(width*mag, height*mag)
 
     // normalize the tensor field
@@ -310,7 +302,7 @@ export function overlayTensor( image : Image2D, tf : TensorField, size : number 
 
     // drawing
     let ctx = outCanvas.getContext('2d')
-    ctx.drawImage(grayImage, 0, 0, width, height, 0, 0, outCanvas.width, outCanvas.height )
+    ctx.drawImage(canvas, 0, 0, width, height, 0, 0, outCanvas.width, outCanvas.height )
 
     let step = 2
     let mjLen = step*size
@@ -348,18 +340,10 @@ export function overlayTensor( image : Image2D, tf : TensorField, size : number 
 }
 
 
-export function overlayTangent( image : Image2D, tf : TensorField, size : number =2 ) : Canvas {
+export function overlayTangent( canvas : Canvas, tf : TensorField, size : number =2 ) : Canvas {
     let mag = 2*size+1
-    let width = image.width
-    let height= image.height
-
-    // normalize the image
-    let max = image.maxValue()
-    let min = image.minValue()
-    let scale = 254/(max-min)
-    let offset= -scale*min
-    let grayScale = image.convertTo('Uint8', scale, offset) as ImageUint8
-    let grayImage = toNodeCanvas(CanvasUtils.fromRGB(grayScale, grayScale, grayScale))
+    let width = canvas.width
+    let height= canvas.height
     let outCanvas = createCanvas(width*mag, height*mag)
 
     // normalize the tensor field
@@ -370,7 +354,7 @@ export function overlayTangent( image : Image2D, tf : TensorField, size : number
 
     // drawing
     let ctx = outCanvas.getContext('2d')
-    ctx.drawImage(grayImage, 0, 0, width, height, 0, 0, outCanvas.width, outCanvas.height )
+    ctx.drawImage(canvas, 0, 0, width, height, 0, 0, outCanvas.width, outCanvas.height )
 
     let step = 2
     let mjLen = step*size
