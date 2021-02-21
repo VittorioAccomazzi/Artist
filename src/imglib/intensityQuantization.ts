@@ -1,7 +1,7 @@
-import {Image2D, ImageUint16, ImageUint8} from './imagebase'
+import {Image2D} from './imagebase'
 
 
-export default class GradientQuantization {
+export default class IntensityQuantization {
 
     /**
      * Generate a smooth quantization of the image. The image content will be replaces (in place quantization)

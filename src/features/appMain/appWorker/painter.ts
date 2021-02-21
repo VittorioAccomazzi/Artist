@@ -3,7 +3,7 @@ import {ImageFloat32} from '../../../imglib/imagebase'
 import CanvasUtil from '../../../imglib/canvasUtils'
 import BilateralFilter from '../../../imglib/bilateralFilter'
 import DifferenceOfGaussian from '../../../imglib/dogFilter'
-import GradientQuantization from '../../../imglib/gradientQuantization'
+import IntensityQuantization from '../../../imglib/intensityQuantization'
 
 const numSteps = 5
 const scaleStd = 4
@@ -43,7 +43,7 @@ export default class Painter {
     private luminosityQuantization(){
         let binSize=12
         let smoothenss = 1
-        GradientQuantization.Run(this.lImage!, binSize, smoothenss) 
+        IntensityQuantization.Run(this.lImage!, binSize, smoothenss) 
     }
 
     private generateDog() {

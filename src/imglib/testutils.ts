@@ -1,11 +1,11 @@
 import { Canvas, createCanvas, loadImage } from 'canvas';
-import {Image2D, isImage} from './imagebase'
+import {Image2D, ImageUint8, isImage} from './imagebase'
 import Histogram from './histogram'
 import CanvasUtils, {SeqCanvas} from './canvasUtils'
 import {imageHash} from 'image-hash'
 import * as fs from 'fs'
 import * as path from 'path'
-import { createTextChangeRange } from 'typescript';
+import TensorField from './tensorField';
 
 
 export const tmpFolder = 'tmp'
@@ -286,6 +286,117 @@ export function randomPoints( width : number, height : number ) : {x:number, y:n
         points.push({x,y})
     }
     return points
+}
+
+export function overlayTensor( image : Image2D, tf : TensorField, size : number =2 ) : Canvas {
+    let mag = 2*size+1
+    let width = image.width
+    let height= image.height
+
+    // normalize the image
+    let max = image.maxValue()
+    let min = image.minValue()
+    let scale = 254/(max-min)
+    let offset= -scale*min
+    let grayScale = image.convertTo('Uint8', scale, offset) as ImageUint8
+    let grayImage = toNodeCanvas(CanvasUtils.fromRGB(grayScale, grayScale, grayScale))
+    let outCanvas = createCanvas(width*mag, height*mag)
+
+    // normalize the tensor field
+    let maxEgVal = tf.fieldTensors.reduce((m,v)=>Math.max(m,v.majVal),0)
+    let rThr = maxEgVal * 2/3 // red threshold : top 30%
+    let gThr = maxEgVal * 1/3 // greeen threshold : mid 30%
+      // blue threshold is bottom 30%
+
+    // drawing
+    let ctx = outCanvas.getContext('2d')
+    ctx.drawImage(grayImage, 0, 0, width, height, 0, 0, outCanvas.width, outCanvas.height )
+
+    let step = 2
+    let mjLen = step*size
+
+    for( let y=0; y<height; y+=step){
+        for( let x=0; x<width; x+=step){
+            let t = tf.get(x,y)
+            let xPos = x*mag+size+1
+            let yPos = y*mag+size+1
+            let col = "#0000FF"
+            if( t.majVal > gThr ) col = "#00FF00"
+            if( t.majVal > rThr ) col = "#FF0000"
+            let xMjS = xPos+t.majVec[0] * mjLen
+            let yMjS = yPos+t.majVec[1] * mjLen
+            let xMjE = xPos-t.majVec[0] * mjLen
+            let yMjE = yPos-t.majVec[1] * mjLen
+
+            ctx.beginPath()
+            ctx.strokeStyle = col
+            ctx.moveTo(xMjS,yMjS)
+            ctx.lineTo(xMjE,yMjE)
+            if( t.minVal > 0 ){
+                let mnlen = Math.max( mjLen * t.minVal/t.majVal, 1 )
+                let xMnS = xPos+t.minVec[0] * mnlen
+                let yMnS = yPos+t.minVec[1] * mnlen
+                let xMnE = xPos-t.minVec[0] * mnlen
+                let yMnE = yPos-t.minVec[1] * mnlen     
+                ctx.moveTo(xMnS,yMnS)
+                ctx.lineTo(xMnE,yMnE)  
+            }
+            ctx.stroke()
+        }
+    }
+    return outCanvas
+}
+
+
+export function overlayTangent( image : Image2D, tf : TensorField, size : number =2 ) : Canvas {
+    let mag = 2*size+1
+    let width = image.width
+    let height= image.height
+
+    // normalize the image
+    let max = image.maxValue()
+    let min = image.minValue()
+    let scale = 254/(max-min)
+    let offset= -scale*min
+    let grayScale = image.convertTo('Uint8', scale, offset) as ImageUint8
+    let grayImage = toNodeCanvas(CanvasUtils.fromRGB(grayScale, grayScale, grayScale))
+    let outCanvas = createCanvas(width*mag, height*mag)
+
+    // normalize the tensor field
+    let maxEgVal = tf.fieldTensors.reduce((m,v)=>Math.max(m,v.minVal),0)
+    let rThr = maxEgVal * 2/3 // red threshold : top 30%
+    let gThr = maxEgVal * 1/3 // greeen threshold : mid 30%
+      // blue threshold is bottom 30%
+
+    // drawing
+    let ctx = outCanvas.getContext('2d')
+    ctx.drawImage(grayImage, 0, 0, width, height, 0, 0, outCanvas.width, outCanvas.height )
+
+    let step = 2
+    let mjLen = step*size
+
+    for( let y=0; y<height; y+=step){
+        for( let x=0; x<width; x+=step){
+            let t = tf.get(x,y)
+            let xPos = x*mag+size+1
+            let yPos = y*mag+size+1
+            let col = "#0000FF"
+            if( t.majVal > gThr ) col = "#00FF00"
+            if( t.majVal > rThr ) col = "#FF0000"
+            if( t.minVal > 0 ){
+                ctx.beginPath()
+                ctx.strokeStyle = col
+                let xMnS = xPos+t.minVec[0] * mjLen
+                let yMnS = yPos+t.minVec[1] * mjLen
+                let xMnE = xPos-t.minVec[0] * mjLen
+                let yMnE = yPos-t.minVec[1] * mjLen     
+                ctx.moveTo(xMnS,yMnS)
+                ctx.lineTo(xMnE,yMnE)  
+                ctx.stroke()
+            }
+        }
+    }
+    return outCanvas
 }
 
 export default {}

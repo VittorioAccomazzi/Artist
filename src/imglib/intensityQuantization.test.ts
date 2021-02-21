@@ -1,6 +1,6 @@
 import {hash, getCanvases, toSeqCanvas, dumpImage, dumpCanvas, toNodeCanvas, toCanvas} from './testutils'
-import {ImageFactory, ImageFloat32, ImageUint8} from './imagebase'
-import GradientQuantization from './gradientQuantization'
+import {ImageFactory} from './imagebase'
+import IntensityQuantization from './intensityQuantization'
 
 test('shall quantize the image', async ()=>{
 
@@ -20,7 +20,7 @@ test('shall quantize the image', async ()=>{
     // second intensities
     for(let y=0; y<height; y++){
         for(let x=0; x<width; x++){
-            let dx = x-xCenter
+            let dx = x-xCenter 
             let dy = y-yCenter
             let dst= Math.sqrt( dx*dx+dy*dy)
             if( dst < radius ){
@@ -38,17 +38,17 @@ test('shall quantize the image', async ()=>{
 
     //await dumpImage(image,`gradient image`)
 
-    GradientQuantization.Run(img0,15,0)
+    IntensityQuantization.Run(img0,15,0)
     //await dumpImage(img0,`gradient image quantized 0`)
     let hsh0 = await hash(img0)
     expect(hsh0).toMatchSnapshot()
 
-    GradientQuantization.Run(img1,15,1)
+    IntensityQuantization.Run(img1,15,1)
     //await dumpImage(img1,`gradient image quantized 1`)
     let hsh1 = await hash(img1)
     expect(hsh1).toMatchSnapshot()
 
-    GradientQuantization.Run(img2,15,2)
+    IntensityQuantization.Run(img2,15,2)
     //await dumpImage(img2,`gradient image quantized 2`)
     let hsh2 = await hash(img2)
     expect(hsh2).toMatchSnapshot()
