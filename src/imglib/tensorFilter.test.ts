@@ -19,7 +19,7 @@ test('shall smooth the image preserving edges',async()=>{
             //dumpCanvas(image,`image ${name} t filter ${i}`)
 
             let hsh = await hash(image)
-            expect(hash).toMatchSnapshot()
+            expect(hsh).toMatchSnapshot()
         }
         
     }

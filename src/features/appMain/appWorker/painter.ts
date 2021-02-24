@@ -4,11 +4,12 @@ import CanvasUtil from '../../../imglib/canvasUtils'
 import BilateralFilter from '../../../imglib/bilateralFilter'
 import DifferenceOfGaussian from '../../../imglib/dogFilter'
 import IntensityQuantization from '../../../imglib/intensityQuantization'
+import TensorFilter from '../../../imglib/tensorFilter'
 
 const numSteps = 5
-const scaleStd = 4
-const rangeStd = 5
-const scaleDog = 2
+const scaleStd = 2
+const rangeStd = 2
+const scaleDog = 3
 
 export default class Painter {
 
@@ -16,16 +17,20 @@ export default class Painter {
     private aImage : ImageFloat32 | null = null
     private bImage : ImageFloat32 | null = null
     private dImage : ImageFloat32 | null = null
+    private oImage : SeqCanvas
     private step : number =0
 
     constructor( inCanvas : SeqCanvas ){
         [this.lImage, this.aImage, this.bImage] = CanvasUtil.toLab(inCanvas)
+        this.oImage = inCanvas
     }
 
     next() : SeqCanvas | null {
         let outCanvas = null
 
         if( this.step < numSteps) {
+            [this.lImage, this.aImage, this.bImage] = TensorFilter.Run(this.lImage!, this.aImage!, this.bImage!,1) as [ ImageFloat32, ImageFloat32, ImageFloat32]
+            [this.lImage, this.aImage, this.bImage] = TensorFilter.Run(this.lImage!, this.aImage!, this.bImage!,1) as [ ImageFloat32, ImageFloat32, ImageFloat32]
             [this.lImage, this.aImage, this.bImage] = BilateralFilter.Run(this.lImage!, this.aImage!, this.bImage!, scaleStd, rangeStd) as [ ImageFloat32, ImageFloat32, ImageFloat32]
             outCanvas = CanvasUtil.fromLab(this.lImage, this.aImage, this.bImage)
         } else if ( this.step === numSteps ){
@@ -60,11 +65,13 @@ export default class Painter {
         let height= dogImage.height
         let nPixels= width*height
         let dogPixels= dogImage.imagePixels
+        let orgPixels= this.oImage.data
         let ptr=0
         for( let p=0; p<nPixels; p++ ){
-            inCanvas.data[ptr++] *= dogPixels[p]
-            inCanvas.data[ptr++] *= dogPixels[p]
-            inCanvas.data[ptr++] *= dogPixels[p]
+            let weight = dogPixels[p]
+            inCanvas.data[ptr] = weight * inCanvas.data[ptr]+(1-weight)*orgPixels[ptr++]
+            inCanvas.data[ptr] = weight * inCanvas.data[ptr]+(1-weight)*orgPixels[ptr++]
+            inCanvas.data[ptr] = weight * inCanvas.data[ptr]+(1-weight)*orgPixels[ptr++]
         }
     }
 
