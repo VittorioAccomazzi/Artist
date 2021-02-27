@@ -1,10 +1,9 @@
-import { O_TRUNC } from 'constants';
 import GaussianFilter from './gaussianFilter';
 import { Image2D } from './imagebase';
 import TensorField from './tensorField';
 import TensorGenerator from './tensorGenerator';
 
-export default class TensorFilter {
+export default class TensorDirSmoothing {
     static Run( c1 : Image2D , c2 : Image2D, c3 : Image2D, sigma : number ) : [ Image2D, Image2D, Image2D ]  {
         let tf = TensorGenerator.Run(c1, c2, c3 ,sigma)
         let kernel = GaussianFilter.buildKernel(sigma)

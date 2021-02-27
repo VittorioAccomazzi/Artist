@@ -4,7 +4,7 @@ import CanvasUtil from '../../../imglib/canvasUtils'
 import BilateralFilter from '../../../imglib/bilateralFilter'
 import DifferenceOfGaussian from '../../../imglib/dogFilter'
 import IntensityQuantization from '../../../imglib/intensityQuantization'
-import TensorFilter from '../../../imglib/tensorFilter'
+import TensorDirSmoothing from '../../../imglib/tensorDirSmoothing'
 
 const numSteps = 5
 const scaleStd = 2
@@ -29,8 +29,8 @@ export default class Painter {
         let outCanvas = null
 
         if( this.step < numSteps) {
-            [this.lImage, this.aImage, this.bImage] = TensorFilter.Run(this.lImage!, this.aImage!, this.bImage!,1) as [ ImageFloat32, ImageFloat32, ImageFloat32]
-            [this.lImage, this.aImage, this.bImage] = TensorFilter.Run(this.lImage!, this.aImage!, this.bImage!,1) as [ ImageFloat32, ImageFloat32, ImageFloat32]
+            [this.lImage, this.aImage, this.bImage] = TensorDirSmoothing.Run(this.lImage!, this.aImage!, this.bImage!,1) as [ ImageFloat32, ImageFloat32, ImageFloat32]
+            [this.lImage, this.aImage, this.bImage] = TensorDirSmoothing.Run(this.lImage!, this.aImage!, this.bImage!,1) as [ ImageFloat32, ImageFloat32, ImageFloat32]
             [this.lImage, this.aImage, this.bImage] = BilateralFilter.Run(this.lImage!, this.aImage!, this.bImage!, scaleStd, rangeStd) as [ ImageFloat32, ImageFloat32, ImageFloat32]
             outCanvas = CanvasUtil.fromLab(this.lImage, this.aImage, this.bImage)
         } else if ( this.step === numSteps ){

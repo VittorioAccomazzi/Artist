@@ -9,7 +9,7 @@
             "type": "node",
             "request": "launch",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
-            "args": ["test", "tensorFilter.test.ts", "--runInBand", "--no-cache", "--no-watch"],
+            "args": ["test", "tensorDirLoG.test.ts", "--runInBand", "--no-cache", "--no-watch"],
             "cwd": "${workspaceRoot}",
             "protocol": "inspector",
             "console": "integratedTerminal",
