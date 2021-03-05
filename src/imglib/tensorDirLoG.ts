@@ -2,7 +2,7 @@ import { Image2D, ImageFactory, ImageFloat32 } from './imagebase';
 import TensorField from './tensorField';
 
 export default class TensorDirLoG {
-    static Run( inImg : Image2D, tf : TensorField, sigma : number, tau: number ) : ImageFloat32 {
+    static Run( inImg : Image2D, tf : TensorField, sigma : number ) : ImageFloat32 {
         let width = inImg.width
         let height= inImg.height
         let ouImg = ImageFactory.Float32(width,height)

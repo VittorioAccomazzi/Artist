@@ -2,6 +2,8 @@ import React, {useState, useEffect,useRef} from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import PanZoom from './PanZoom'
 import ForeWorker from './appWorker/fworker'
+import { useSelector } from 'react-redux';
+import { selectPainter } from './appWorker/painterSlice';
 
 const useStyles = makeStyles((theme) => ({
     mainDiv:   {
@@ -20,6 +22,7 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
     let mDiv   = useRef<HTMLDivElement|null>(null) 
     let worker = useRef<ForeWorker|null>(null)
     const classes  = useStyles();
+    const painter = useSelector(selectPainter)
 
 
     useEffect(()=>{
@@ -29,7 +32,7 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
         img.onload = (e) => {
             const startWorker = () =>{
                 if( canvas.current){
-                    worker.current = new ForeWorker(img, canvas.current)
+                    worker.current = new ForeWorker(img, canvas.current, painter)
                     worker.current.start()
                     setLoading(false)
                 } else {
@@ -41,7 +44,7 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
             else startWorker()
         }
         img.src= imagePath
-    },[imagePath,canvas])
+    },[imagePath,canvas, painter])
 
     return (
         <div ref={mDiv} className={classes.mainDiv}>

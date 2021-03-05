@@ -24,7 +24,7 @@ test('shall detect edges',async ()=>{
     }
 
     let tf = TensorGenerator.Run(img, img, img, 1 )
-    let flt= TensorDirLoG.Run(img, tf, 2, 0.1)
+    let flt= TensorDirLoG.Run(img, tf, 2)
 
     let canvas = toCanvas(img)
     let tensor = overlayTensor(canvas, tf, 2)
@@ -45,7 +45,7 @@ test('shall find the local image variation',async()=>{
         
         GaussianFilter.Run(lImg,1)
         let tf = TensorGenerator.Run(lImg, aImg, bImg, 1) 
-        let flt= TensorDirLoG.Run(lImg, tf, 1.5, 0.1)
+        let flt= TensorDirLoG.Run(lImg, tf, 1.5)
         // await dumpImage(flt, `tensor LoG image ${name}`)
         let hsh = await hash(flt)
         expect(hsh).toMatchSnapshot()

@@ -3,11 +3,16 @@ import {Image2D, ImageFactory, ImageFloat32} from './imagebase'
 import Gradient from './gradient'
 import GaussianFilter from './gaussianFilter'
 
+export interface TensorRelax {
+    tau : number,
+    nIterations : number
+}
 
 export default class TensorGenerator {
 
-    static Run( c1 : Image2D, c2 : Image2D, c3 : Image2D, sigma : number ) : TensorField {
-        const [dx2, dy2, dxy]= this.filterComponents(c1, c2, c3, sigma)
+    static Run( c1 : Image2D, c2 : Image2D, c3 : Image2D, sigma : number, relax? : TensorRelax  ) : TensorField {
+        let [dx2, dy2, dxy]= this.filterComponents(c1, c2, c3, sigma)
+        if( relax ) [dx2, dy2, dxy ] = this.relax(dx2, dy2, dxy, relax )
 
         // https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect6.pdf slide 21 and 22
         // notice that the major eigenvectors are computed a descibed in 
@@ -33,6 +38,43 @@ export default class TensorGenerator {
             return {majVec, minVec, majVal, minVal}
         })
         return new TensorField(tensors, width)
+    }
+    static relax(dx2: ImageFloat32, dy2: ImageFloat32, dxy: ImageFloat32, param: TensorRelax): [ImageFloat32, ImageFloat32, ImageFloat32] {
+        let width = dx2.width
+        let height= dx2.height
+        let thrshd= param.tau * param.tau
+        for( let n=0; n<param.nIterations; n++){
+            let ox2= ImageFactory.Float32(width,height)
+            let oy2= ImageFactory.Float32(width,height)
+            let oxy= ImageFactory.Float32(width,height)
+            for( let y=1; y<height-1; y++){
+                for( let x=1; x<width-1; x++){
+                    let x2 = dx2.get(x,y)
+                    let y2 = dy2.get(x,y)
+                    let xy = dxy.get(x,y)
+                    let mag= x2*x2+y2*y2+2*xy*xy
+                    if( mag < thrshd ){
+                        x2 = this.average(dx2, x, y)
+                        y2 = this.average(dy2, x, y)
+                        xy = this.average(dxy, x, y)
+                    }
+                    ox2.set(x,y,x2)
+                    oy2.set(x,y,y2)
+                    oxy.set(x,y,xy)
+                }
+            }
+            dx2 = ox2
+            dy2 = oy2
+            dxy = oxy
+        }
+        return [dx2, dy2, dxy]
+    }
+    static average(img: ImageFloat32, x: number, y: number): number {
+        let v1 = img.get(x-1, y)
+        let v2 = img.get(x, y-1)
+        let v3 = img.get(x+1, y)
+        let v4 = img.get(x, y+1)
+        return (v1+v2+v3+v4)/4
     }
 
 

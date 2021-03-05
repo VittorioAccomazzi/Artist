@@ -2,6 +2,7 @@
 import comlinkWorker from 'comlink-loader!./bworker.ts'
 import BackWorker, {BackWorkerClassConstructors} from './bworker'
 import CanvasUtil from '../../../imglib/canvasUtils'
+import { PainterType } from './painterSlice'
 
 
 const BackWorkerFactory = new comlinkWorker<BackWorkerClassConstructors>()
@@ -16,8 +17,9 @@ export default class ForeWorker {
     private canvas : HTMLCanvasElement | null = null
     private bworker : BackWorker | null = null
     private timer : number | null = null
+    private type : PainterType
 
-    constructor( image : HTMLImageElement, canvas : HTMLCanvasElement ){
+    constructor( image : HTMLImageElement, canvas : HTMLCanvasElement, type : PainterType ) {
         let imgWidth = image.naturalWidth
         let imgHeight= image.naturalHeight
         let wScale = targetSize/imgWidth
@@ -35,6 +37,7 @@ export default class ForeWorker {
         } else {
             console.error(`unable to obtain canvas context`)
         }
+        this.type = type
     }
 
     async start(){
@@ -45,7 +48,7 @@ export default class ForeWorker {
                 if( this.bworker == null  ){
                     // start
                     let seqCanvas = CanvasUtil.toSeq(this.canvas)
-                    this.bworker  = await new BackWorkerFactory.default(seqCanvas)
+                    this.bworker  = await new BackWorkerFactory.default(seqCanvas, this.type)
                 }
                 const sCanvas= await this.bworker!.next() // do work !
                 if( sCanvas ){

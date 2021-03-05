@@ -1,6 +1,9 @@
 import {SeqCanvas} from '../../../imglib/canvasUtils'
+import BilateralPainter from './bilateralPainter'
 import Painter from './painter'
-export type BackWorkerClassConstructors = { new (inCanvas : SeqCanvas): BackWorker }
+import { PainterType } from './painterSlice'
+import TensorPainter from './tensorPainter'
+export type BackWorkerClassConstructors = { new (inCanvas : SeqCanvas, type : PainterType): BackWorker }
 
 /**
  * background worker class. This class is designed to work on the background 
@@ -10,13 +13,20 @@ export default class BackWorker {
 
     private worker : Painter | null = null
 
-    constructor( inCanvas : SeqCanvas ){
-        this.worker = new Painter(inCanvas)
+    constructor( inCanvas : SeqCanvas, type : PainterType ){
+        switch( type ){
+            case PainterType.Bilateral :
+                this.worker = new BilateralPainter(inCanvas)
+                break;
+            case PainterType.Tensor :
+                this.worker = new TensorPainter(inCanvas)
+                break;
+        }
     }
 
     async next() {
         let image = null
-        if( this.worker ) image = this.worker.next()
+        if( this.worker ) image = this.worker.nextImage()
         return image
     }
 

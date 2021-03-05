@@ -1,8 +1,9 @@
-import { getCanvases, hash, dumpCanvas, toSeqCanvas, dumpImage, overlayTensor, overlayTangent } from './testutils'
+import { getCanvases, hash, dumpCanvas, toSeqCanvas, dumpImage, overlayTensor, overlayTangent, toCanvas } from './testutils'
 import TensorGenerator from './tensorGenerator'
 import {ImageFactory} from './imagebase'
 import {randomPoints} from './testutils'
 import CanvasUtils from './canvasUtils'
+import { FitnessCenter } from '@material-ui/icons'
 
 test('shall  generate orthogonal tensors',()=>{
     let width = 88
@@ -125,7 +126,6 @@ test('shall compute eigen values correctly',async()=>{
 })
 
 test('shall find the local image variation',async()=>{
-    const medianKernerl = 5
     for await ( const [canvas,ctx,name] of getCanvases() ) {
         let [lImg, aImg, bImg] = CanvasUtils.toLab(toSeqCanvas(canvas))
         
@@ -144,4 +144,40 @@ test('shall find the local image variation',async()=>{
         // await dumpCanvas(tgCanvas,`tangent field canvas ${name}`) 
     }
 },2*60*1000)
+
+test('shall be able to relax the tensor field', async()=>{
+    let width = 250
+    let height= 200
+    let image = ImageFactory.Uint8(width,height)
+    let pixels= image.imagePixels
+    pixels.forEach((v,i)=>{
+        let y = (i/width | 0) 
+        let x = (i%width)
+        let val = y
+        if( Math.abs(x-90)<4 ) val = 254
+        pixels[i]=val
+    })
+    let points = randomPoints(width,height)
+
+    // add noise
+    points.forEach((p,i)=>{
+        let v = image.get(p.x,p.y)
+        v = i%2 ? v+1 : v-1
+        image.set(p.x, p.y,v)
+    })
+
+    // generate tensof no relax 
+    let tf = TensorGenerator.Run(image, image, image, 1)
+    let tfOverlay = overlayTangent(toCanvas(image), tf, 2)
+    // await dumpCanvas(tfOverlay,`Image with no relax`)
+    let hsh = await hash(tfOverlay)
+    expect(hsh).toMatchSnapshot()
+
+    tf = TensorGenerator.Run(image, image, image, 1, { nIterations:2, tau : 31000})
+    tfOverlay = overlayTangent(toCanvas(image), tf, 2)
+    // await dumpCanvas(tfOverlay,`Image with with relax`)
+    hsh = await hash(tfOverlay)
+    expect(hsh).toMatchSnapshot()
+
+}, 60*1000)
 

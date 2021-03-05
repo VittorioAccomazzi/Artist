@@ -1,5 +1,5 @@
 import { Canvas, createCanvas, loadImage } from 'canvas';
-import {Image2D, ImageUint8, isImage} from './imagebase'
+import {Image2D, isImage} from './imagebase'
 import Histogram from './histogram'
 import CanvasUtils, {SeqCanvas} from './canvasUtils'
 import {imageHash} from 'image-hash'
@@ -7,11 +7,13 @@ import * as fs from 'fs'
 import * as path from 'path'
 import TensorField from './tensorField';
 
-
 export const tmpFolder = 'tmp'
-export const testImage1 = 'src/imglib/testimages/test1.jpg'
-export const testImage2 = 'src/imglib/testimages/test2.jpg'
-export const testImages = [ testImage1, testImage2]
+const testImage1 = 'src/imglib/testimages/test1.jpg'
+const testImage2 = 'src/imglib/testimages/test2.jpg'
+const testImage3 = 'src/imglib/testimages/test3.png'
+const testImage4 = 'src/imglib/testimages/test4.png'
+const testImages = [ testImage1, testImage2]
+const allImages  = [ testImage1, testImage2, testImage3, testImage4]
 
 export async function hash( image : Canvas | Image2D ) : Promise<string> {
     let canvas =  isImage(image) ? toCanvas(image) : image
@@ -29,8 +31,9 @@ export async function hash( image : Canvas | Image2D ) : Promise<string> {
     })
 }
 
-export async function* getCanvases() : AsyncGenerator<[Canvas, CanvasRenderingContext2D, string]>{
-    for( let img of testImages) {
+export async function* getCanvases( fullset : boolean = false ) : AsyncGenerator<[Canvas, CanvasRenderingContext2D, string]>{
+    let imgList =  fullset ? allImages : testImages
+    for( let img of imgList) {
         let image = await loadImage(img)
         let canvas= createCanvas(image.width, image.height);
         let ctx = canvas.getContext('2d')
