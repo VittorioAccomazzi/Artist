@@ -10,8 +10,11 @@ The goal of the project is to create artistic images of your pictures and make t
 The application is a Web app powered by react. Since web application can allow the user to select images, and access them, the technology is well suited  for this purpose.
 
 ## Sample Images
+Click on the immages to magnify them.
 ![Sample1](docs/Sample1.png)
+![Sample3](docs/Sample3.png)
 ![Sample2](docs/Sample2.png)
+![Sample4](docs/Sample4.png)
 
 ## Application Link
 .. to do...
