@@ -5,6 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { Hidden } from '@material-ui/core';
 import {BilateralPainter, TensorPainter} from './paintersTools'
+import DownloadTool from './downloadTool'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +34,7 @@ export default function AppToolbar() {
           <div>
             <BilateralPainter/>
             <TensorPainter/>
+            <DownloadTool/>
           </div>
         </Toolbar>
       </AppBar>

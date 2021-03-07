@@ -1,9 +1,11 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import painterReducer from './features/appMain/appWorker/painterSlice'
+import downloadReducer from './features/appMain/downloadSlice'
 
 export const store = configureStore({
   reducer: {
-    painter : painterReducer
+    painter : painterReducer,
+    download: downloadReducer
   },
 });
 

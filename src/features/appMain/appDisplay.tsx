@@ -2,8 +2,9 @@ import React, {useState, useEffect,useRef} from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import PanZoom from './PanZoom'
 import ForeWorker from './appWorker/fworker'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectPainter } from './appWorker/painterSlice';
+import { selecDownload, setDownload } from './downloadSlice';
 
 const useStyles = makeStyles((theme) => ({
     mainDiv:   {
@@ -21,10 +22,26 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
     let canvas = useRef<HTMLCanvasElement|null>(null)
     let mDiv   = useRef<HTMLDivElement|null>(null) 
     let worker = useRef<ForeWorker|null>(null)
-    const classes  = useStyles();
+    const classes = useStyles();
     const painter = useSelector(selectPainter)
+    const download= useSelector(selecDownload)
+    const dispatch= useDispatch();
+
+    // Downloader
+    useEffect(()=>{
+        if( canvas.current && download && worker.current ){
+            // see https://stackoverflow.com/questions/10673122/how-to-save-canvas-as-an-image-with-canvas-todataurl
+            let dImage = canvas.current.toDataURL('image/jpg').replace("image/png", "image/octet-stream"); 
+            let link = document.createElement('a') 
+            link.setAttribute('download', 'myImage.jpg')
+            link.setAttribute('href', dImage)
+            link.click()  
+        }
+        dispatch(setDownload(false))
+    },[canvas, download, dispatch])
 
 
+    // Image processor
     useEffect(()=>{
         if( imagePath === null ) return;
         setLoading(true)
@@ -38,7 +55,6 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
                 } else {
                     console.error(`canvas null when image received. THIS SHOULD NOT HAPPEN`)
                 }
-                
             }
             if( worker.current != null )  worker.current.stop().then(startWorker)
             else startWorker()
