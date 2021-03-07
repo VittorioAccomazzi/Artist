@@ -1,10 +1,11 @@
-import React, {useState, useEffect,useRef} from 'react'
+import React, {useState, useEffect,useRef, useCallback} from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import PanZoom from './PanZoom'
 import ForeWorker from './appWorker/fworker'
 import { useDispatch, useSelector } from 'react-redux';
 import { selectPainter } from './appWorker/painterSlice';
 import { selecDownload, setDownload } from './downloadSlice';
+import { setProgress } from './progressSlice';
 
 const useStyles = makeStyles((theme) => ({
     mainDiv:   {
@@ -42,6 +43,12 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
 
 
     // Image processor
+
+    const progressCallback = useCallback((current : number, total : number) =>{
+        dispatch(setProgress({current, total}))
+    },[dispatch])
+
+
     useEffect(()=>{
         if( imagePath === null ) return;
         setLoading(true)
@@ -49,7 +56,7 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
         img.onload = (e) => {
             const startWorker = () =>{
                 if( canvas.current){
-                    worker.current = new ForeWorker(img, canvas.current, painter)
+                    worker.current = new ForeWorker(img, canvas.current, painter, progressCallback)
                     worker.current.start()
                     setLoading(false)
                 } else {

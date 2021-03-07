@@ -9,6 +9,8 @@ const BackWorkerFactory = new comlinkWorker<BackWorkerClassConstructors>()
 const targetSize = 1024
 const timerSpeed = 300 // millisecond
 
+export type Progress = ( current : number, total : number ) => void
+
 /**
  * Foreground worker class. This class is designed to work  on the UI Javascript thread
  */
@@ -18,8 +20,9 @@ export default class ForeWorker {
     private bworker : BackWorker | null = null
     private timer : number | null = null
     private type : PainterType
+    private progress : Progress
 
-    constructor( image : HTMLImageElement, canvas : HTMLCanvasElement, type : PainterType ) {
+    constructor( image : HTMLImageElement, canvas : HTMLCanvasElement, type : PainterType, progress : Progress ) {
         let imgWidth = image.naturalWidth
         let imgHeight= image.naturalHeight
         let wScale = targetSize/imgWidth
@@ -38,6 +41,7 @@ export default class ForeWorker {
             console.error(`unable to obtain canvas context`)
         }
         this.type = type
+        this.progress = progress
     }
 
     async start(){
@@ -49,14 +53,13 @@ export default class ForeWorker {
                     // start
                     let seqCanvas = CanvasUtil.toSeq(this.canvas)
                     this.bworker  = await new BackWorkerFactory.default(seqCanvas, this.type)
+                    this.progress( 1, 10 ) // arbitraty, show that the work has started
                 }
-                const sCanvas= await this.bworker!.next() // do work !
-                if( sCanvas ){
-                    CanvasUtil.fromSeq(sCanvas, this.canvas)
+                const work = await this.bworker!.next() // do work !
+                if( work.image ){
+                    CanvasUtil.fromSeq(work.image, this.canvas)
                     this.timer  = window.setTimeout(doWork, timerSpeed) // continue the work
-                }
-                if( sCanvas == null) {
-                    console.log('Done !!')
+                    this.progress( work.current, work.total)
                 }
             }
         }

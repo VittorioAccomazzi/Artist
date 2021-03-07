@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { Hidden } from '@material-ui/core';
 import {BilateralPainter, TensorPainter} from './paintersTools'
 import DownloadTool from './downloadTool'
+import PainterProgress from './painterProgress'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -15,6 +16,10 @@ const useStyles = makeStyles((theme: Theme) =>
     toolbar : {
       display:'flex',
       justifyContent:'space-between'
+    },
+    toolList : {
+      display:'flex',
+      alignItems:'center'
     }
   }),
 );
@@ -31,7 +36,8 @@ export default function AppToolbar() {
               Artist
             </Typography>
           </Hidden>
-          <div>
+          <div className={classes.toolList}>
+            <PainterProgress/>
             <BilateralPainter/>
             <TensorPainter/>
             <DownloadTool/>

@@ -26,8 +26,14 @@ export default class BackWorker {
 
     async next() {
         let image = null
-        if( this.worker ) image = this.worker.nextImage()
-        return image
+        let current=0;
+        let total =0;
+        if( this.worker ) {
+            image = this.worker.nextImage()
+            current = this.worker.current
+            total = this.worker.total
+        }
+        return { image, current, total }
     }
 
     async stop(){

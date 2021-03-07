@@ -15,8 +15,11 @@ export default abstract class Painter {
         this.numSteps = numSteps
     }
 
-    public get Persentage() : number {
-        return this.currStep/this.numSteps
+    public get current() : number {
+        return this.currStep
+    } 
+    public get total() : number {
+        return this.numSteps
     }
 
     public nextImage() : SeqCanvas | null {
