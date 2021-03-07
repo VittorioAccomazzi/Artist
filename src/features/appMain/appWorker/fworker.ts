@@ -51,9 +51,9 @@ export default class ForeWorker {
             if( this.canvas) {
                 if( this.bworker == null  ){
                     // start
+                    this.progress( 0, 10 ) // arbitraty, just set it to 0 now.
                     let seqCanvas = CanvasUtil.toSeq(this.canvas)
                     this.bworker  = await new BackWorkerFactory.default(seqCanvas, this.type)
-                    this.progress( 1, 10 ) // arbitraty, show that the work has started
                 }
                 const work = await this.bworker!.next() // do work !
                 if( work.image ){

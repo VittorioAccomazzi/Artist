@@ -5,14 +5,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { PainterType, selectPainter, setPainter } from '../appMain/appWorker/painterSlice'
 import ToolButton from './toolButton'
 import BrushIcon from '@material-ui/icons/Brush'
-import FormatPaintIcon from '@material-ui/icons/FormatPaint'
+import PaletteIcon from '@material-ui/icons/Palette';
 
 export function BilateralPainter () {
-    return <PainterTool Icon={BrushIcon} type={PainterType.Bilateral}/>
+    return <PainterTool Icon={PaletteIcon} type={PainterType.Bilateral}/>
 }
 
 export function TensorPainter () {
-    return <PainterTool Icon={FormatPaintIcon} type={PainterType.Tensor}/>  
+    return <PainterTool Icon={BrushIcon} type={PainterType.Tensor}/>  
 }
 
 type PainterToolInfo = {

@@ -22,12 +22,14 @@ export default function PainterProgress() {
     const progress   = useSelector(selectProgress)
     const showProgres= progress.total > 0 && progress.current < progress.total
     const percentage = showProgres ? progress.current/progress.total * 100 : 0
+    const progVariant = percentage > 0 ? "determinate" : "indeterminate";
+    const progLabel   = percentage > 0 ? `${Math.round(percentage)}%` : ``
     return(
         <>
             {
                 showProgres ?
                 <Box position="relative" display="inline-flex">
-                    <CircularProgress className={classes.cirProgress} variant="determinate" value={percentage} /> 
+                    <CircularProgress className={classes.cirProgress} variant={progVariant} value={percentage} /> 
                     <Box
                         top={0}
                         left={0}
@@ -38,7 +40,7 @@ export default function PainterProgress() {
                         alignItems="center"
                         justifyContent="center"
                     >
-                    <Typography variant="caption" component="div" className={classes.txtProgress}>{`${Math.round(percentage)}%`}</Typography>
+                    <Typography variant="caption" component="div" className={classes.txtProgress}>{progLabel}</Typography>
                     </Box>
                 </Box>
                 :
