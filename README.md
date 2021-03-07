@@ -12,9 +12,9 @@ The application is a Web app powered by react. Since web application can allow t
 ## Sample Images
 Click on the immages to magnify them.
 ![Sample1](docs/Sample1.png)
-![Sample3](docs/Sample3.png)
-![Sample2](docs/Sample2.png)
 ![Sample4](docs/Sample4.png)
+![Sample2](docs/Sample2.png)
+![Sample3](docs/Sample3.png)
 
 ## Application Link
 .. to do...
