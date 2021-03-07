@@ -21,7 +21,7 @@ type PainterToolInfo = {
 }
 function PainterTool( {Icon, type}: PainterToolInfo) {
     const selPainter =  useSelector(selectPainter)
-    const isSelected = selPainter == type
+    const isSelected = selPainter === type
     const dispatch   = useDispatch()
     const onClick    = () => dispatch(setPainter(type))
     return (

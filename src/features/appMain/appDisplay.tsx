@@ -67,7 +67,7 @@ export default function AppDisplay({imagePath} : AppDisplayInfo){
             else startWorker()
         }
         img.src= imagePath
-    },[imagePath,canvas, painter])
+    },[imagePath,canvas, painter, progressCallback])
 
     return (
         <div ref={mDiv} className={classes.mainDiv}>
