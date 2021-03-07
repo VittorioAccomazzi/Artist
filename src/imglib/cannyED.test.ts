@@ -1,8 +1,8 @@
-import {hash, getCanvases, toHTMLCanvas, toNodeCanvas, dumpImage} from './testutils'
+import {hash, getCanvases, toSeqCanvas, dumpImage} from './testutils'
 import {ImageFactory} from './imagebase'
-import CannyEdgeDetection from './cannyed'
 import CanvasUtils from './canvasUtils'
 import GaussianFilter from './gaussianFilter'
+import CannyEdgeDetection from './cannyED'
 
 test('shall detect clear borders', async ()=>{
     let width = 25
@@ -29,9 +29,9 @@ test('shall detect clear borders', async ()=>{
 
 test('shall find edges on real images',async ()=>{
     for await ( const [canvas,ctx,name] of getCanvases() ) {
-        let int = CanvasUtils.toGrayScale(toHTMLCanvas(canvas))
+        let int = CanvasUtils.toGrayScale(toSeqCanvas(canvas))
         let canny = CannyEdgeDetection.Detect(int, 0.98, 0.99)
-        await dumpImage(canny,`canny-${name}`)
+        //await dumpImage(canny,`canny-${name}`)
         let hsh = await hash(canny)
         expect(hsh).toMatchSnapshot()
     }
@@ -39,10 +39,10 @@ test('shall find edges on real images',async ()=>{
 
 test('shall find edges on filtered images',async ()=>{
     for await ( const [canvas,ctx,name] of getCanvases() ) {
-        let int = CanvasUtils.toGrayScale(toHTMLCanvas(canvas))
-        let flt = GaussianFilter.Run(int,2.0)
+        let int = CanvasUtils.toGrayScale(toSeqCanvas(canvas))
+        GaussianFilter.Run(int,2.0)
         let canny = CannyEdgeDetection.Detect(int, 0.98, 0.99)
-        await dumpImage(canny,`canny-filt-${name}`)
+        //await dumpImage(canny,`canny-filt-${name}`)
         let hsh = await hash(canny)
         expect(hsh).toMatchSnapshot()
     }

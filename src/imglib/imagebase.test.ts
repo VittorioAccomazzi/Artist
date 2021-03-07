@@ -1,4 +1,5 @@
-import {ImageFactory} from './imagebase'
+import { textChangeRangeIsUnchanged } from 'typescript'
+import {ImageFactory, isImage} from './imagebase'
 
 test('shall report correct image size',()=>{
     let width =5
@@ -89,6 +90,12 @@ test('shall support image conversion',()=>{
 
     img8 = img32.convertTo('Uint8', -1, 0)
     expect(img8.get(x,y)).toBe(-v+0)
+
+    // fractional value
+    v=12.9
+    img32.set(x,y,v)
+    img16 = img32.convertTo('Uint16')
+    expect(img16.get(x,y)).toBe(Math.floor(v)) // values are truncated
 
 })
 
@@ -197,4 +204,16 @@ test('shall support float values',()=>{
     let val = -3.2
     image.set(1,1,val)
     expect(image.get(1,1)).toBeCloseTo(val, 5)
+})
+
+test('shall implement isImage function',()=>{
+    let img8  = ImageFactory.Uint8(8,8)
+    let img16 = ImageFactory.Uint16(8,8)
+    let img32 = ImageFactory.Float32(8,8)
+    let arr = [2,3,4,56]
+
+    expect(isImage(img8)).toBeTruthy()
+    expect(isImage(img16)).toBeTruthy()
+    expect(isImage(img32)).toBeTruthy()
+    expect(isImage(arr)).toBeFalsy()
 })

@@ -1,5 +1,5 @@
 import {ImageFactory} from './imagebase'
-import Histogram from './histogram'
+import Histogram, { isHistogram } from './histogram'
 
 test('shall properly computte the bins',()=>{
     let width = 12
@@ -48,6 +48,17 @@ test('shall support 8bit and 16 bit images',()=>{
     expect(hist.histogramBins[4092]).toBe(1)
     expect(hist.maxValue).toBe(width*height-1)
 
+})
+
+test('shall contain functon isHistogram',()=>{
+    let width = 8
+    let height= 8
+    let image = ImageFactory.Uint16(width, height)
+    let hist = new Histogram(image)
+    let bin = [2,3,4,5,0,0]
+    expect(isHistogram(hist)).toBeTruthy()
+    expect(isHistogram(image)).toBeFalsy()
+    expect(isHistogram(bin)).toBeFalsy()
 })
 
 

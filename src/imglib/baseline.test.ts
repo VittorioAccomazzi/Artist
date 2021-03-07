@@ -1,15 +1,7 @@
-import {testImages,hash, getCanvases} from './testutils'
-import {loadImage} from 'canvas'
-
-test('test image shall be present', async ()=>{
-    for( let img of testImages) {
-        let c = await loadImage(img)
-        expect(c).not.toBeNull()
-    }
-})
+import {hash, getCanvases} from './testutils'
 
 test('validate basline hash', async()=>{
-    for await ( const [canvas,] of getCanvases() ) {
+    for await ( const [canvas,] of getCanvases(true) ) {
         let h = await hash(canvas)
         expect(h).toMatchSnapshot();
     }
