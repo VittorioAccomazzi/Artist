@@ -10,7 +10,7 @@ interface PainterState {
   }
   
   const initialState: PainterState = {
-    painter : PainterType.Bilateral
+    painter : PainterType.Tensor
   };
 
   export const slice = createSlice({
