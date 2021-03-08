@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.js": "/Artist/static/js/main.7b1c7f39.chunk.js",
-    "main.js.map": "/Artist/static/js/main.7b1c7f39.chunk.js.map",
+    "main.js": "/Artist/static/js/main.8f742f2c.chunk.js",
+    "main.js.map": "/Artist/static/js/main.8f742f2c.chunk.js.map",
     "runtime-main.js": "/Artist/static/js/runtime-main.0cbab4c3.js",
     "runtime-main.js.map": "/Artist/static/js/runtime-main.0cbab4c3.js.map",
     "static/js/2.fced8bbc.chunk.js": "/Artist/static/js/2.fced8bbc.chunk.js",
     "static/js/2.fced8bbc.chunk.js.map": "/Artist/static/js/2.fced8bbc.chunk.js.map",
-    "0fa318f501484e94ff44.worker.js": "/Artist/0fa318f501484e94ff44.worker.js",
-    "0fa318f501484e94ff44.worker.js.LICENSE.txt": "/Artist/0fa318f501484e94ff44.worker.js.LICENSE.txt",
-    "0fa318f501484e94ff44.worker.js.map": "/Artist/0fa318f501484e94ff44.worker.js.map",
+    "89f2bf357941874d1e1d.worker.js": "/Artist/89f2bf357941874d1e1d.worker.js",
+    "89f2bf357941874d1e1d.worker.js.LICENSE.txt": "/Artist/89f2bf357941874d1e1d.worker.js.LICENSE.txt",
+    "89f2bf357941874d1e1d.worker.js.map": "/Artist/89f2bf357941874d1e1d.worker.js.map",
     "index.html": "/Artist/index.html",
     "static/js/2.fced8bbc.chunk.js.LICENSE.txt": "/Artist/static/js/2.fced8bbc.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.0cbab4c3.js",
     "static/js/2.fced8bbc.chunk.js",
-    "static/js/main.7b1c7f39.chunk.js"
+    "static/js/main.8f742f2c.chunk.js"
   ]
 }
