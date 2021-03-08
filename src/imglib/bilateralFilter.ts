@@ -81,7 +81,7 @@ export default class BilateralFilter {
      * generate a 2D Gaussian kernel using the separable property of the gaussian
      * @param sigma std
      */
-    private static buildSpaceWeights( sigma : number) : number [][] {
+    public static buildSpaceWeights( sigma : number) : number [][] {
         let kernel1D = GaussianFilter.buildKernel(sigma)
         let kernel2D = new Array(kernel1D.length).fill(null).map(()=>new Array(kernel1D.length).fill(0))
         kernel2D.forEach((row : number [] , y: number)=>{
@@ -94,7 +94,7 @@ export default class BilateralFilter {
      * generate the 1D kernel for the range gaussian, which start at location x=0
      * @param sigma std
      */
-    private static buildRangeWeights( sigma : number ) : number [] {
+    public static buildRangeWeights( sigma : number ) : number [] {
         let kernel1D = GaussianFilter.buildKernel(sigma)
         assert( kernel1D.length %2 == 1)
         let hLen = (kernel1D.length-1)/2
