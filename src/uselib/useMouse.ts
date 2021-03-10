@@ -118,6 +118,7 @@ export default function useMouse( targetRef :  React.MutableRefObject<HTMLElemen
 
         const onMouseWheel = (event: WheelEvent) =>{
             if( !isMobile ){
+                event.preventDefault()
                 setUserEvent({
                     device : umDeviceTypes.Mouse,
                     event : {
