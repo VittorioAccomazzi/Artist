@@ -18,7 +18,7 @@ export default class TensorPainter extends Painter {
     protected generate(step: number ) : SeqCanvas {
         [this.lImage, this.aImage, this.bImage] = TensorSmoothing.Run(this.lImage, this.aImage, this.bImage,1.5,tRelax) as [ ImageFloat32, ImageFloat32, ImageFloat32]
         let tf = TensorGenerator.Run(this.lImage, this.aImage, this.bImage, 1,tRelax)
-        this.lImage = TensorShock.Run(this.lImage, tf, 1.5, 5, 1) as ImageFloat32
+        this.lImage = TensorShock.Run(this.lImage, tf, 1.5, 10, 1) as ImageFloat32
         return CanvasUtil.fromLab(this.lImage, this.aImage, this.bImage)
     }
 
