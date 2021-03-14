@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.js": "/Artist/static/js/main.8c8d7215.chunk.js",
-    "main.js.map": "/Artist/static/js/main.8c8d7215.chunk.js.map",
+    "main.js": "/Artist/static/js/main.541ce284.chunk.js",
+    "main.js.map": "/Artist/static/js/main.541ce284.chunk.js.map",
     "runtime-main.js": "/Artist/static/js/runtime-main.0cbab4c3.js",
     "runtime-main.js.map": "/Artist/static/js/runtime-main.0cbab4c3.js.map",
     "static/js/2.84693d7f.chunk.js": "/Artist/static/js/2.84693d7f.chunk.js",
     "static/js/2.84693d7f.chunk.js.map": "/Artist/static/js/2.84693d7f.chunk.js.map",
-    "89f2bf357941874d1e1d.worker.js": "/Artist/89f2bf357941874d1e1d.worker.js",
-    "89f2bf357941874d1e1d.worker.js.LICENSE.txt": "/Artist/89f2bf357941874d1e1d.worker.js.LICENSE.txt",
-    "89f2bf357941874d1e1d.worker.js.map": "/Artist/89f2bf357941874d1e1d.worker.js.map",
+    "2b93bbab8b104978dab7.worker.js": "/Artist/2b93bbab8b104978dab7.worker.js",
+    "2b93bbab8b104978dab7.worker.js.LICENSE.txt": "/Artist/2b93bbab8b104978dab7.worker.js.LICENSE.txt",
+    "2b93bbab8b104978dab7.worker.js.map": "/Artist/2b93bbab8b104978dab7.worker.js.map",
     "index.html": "/Artist/index.html",
     "static/js/2.84693d7f.chunk.js.LICENSE.txt": "/Artist/static/js/2.84693d7f.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.0cbab4c3.js",
     "static/js/2.84693d7f.chunk.js",
-    "static/js/main.8c8d7215.chunk.js"
+    "static/js/main.541ce284.chunk.js"
   ]
 }
