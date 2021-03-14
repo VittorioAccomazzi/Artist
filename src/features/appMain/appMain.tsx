@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react'
+import React, {useState, useCallback, useEffect} from 'react'
 import  { useDropzone } from "react-dropzone"
 import { FileWithPath } from "file-selector";
 import { makeStyles } from '@material-ui/core/styles';
@@ -6,6 +6,8 @@ import AddIcon from '@material-ui/icons/Add';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import Typography from '@material-ui/core/Typography';
 import AppDisplay from './appDisplay'
+import { useDispatch, useSelector } from 'react-redux';
+import { selecUpload, setUpload } from './uploadSlice';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -51,6 +53,8 @@ const useStyles = makeStyles((theme) => ({
     const imageExtensions = ['.jpg','.png','.jpeg']
 
     export default function AppMain(){
+        const upload = useSelector(selecUpload)
+        const dispatch= useDispatch()
         const classes = useStyles();
         const [file, setFile] = useState<string|null>(null)
         const onDrop = useCallback((files: FileWithPath[]) => {
@@ -58,10 +62,16 @@ const useStyles = makeStyles((theme) => ({
             if( list.length > 0 ) {
                 let path = URL.createObjectURL(list[0])
                 setFile(path)
+                dispatch(setUpload(false))
             }
-        }, [])
-        const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
+        }, [setFile])
+        const {getRootProps, getInputProps, open, isDragActive} = useDropzone({onDrop})
 
+        useEffect(()=>{
+            if( upload ){
+                open()
+            }
+        },[open, upload])
     
         return (
             <div className={classes.root}>
@@ -71,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
                                 <Typography className="text">Drop the images here.</Typography>
                             </div> 
                             {
-                                file !== null ?
+                                file !== null && !upload ?
                                 <>
                                     <AppDisplay imagePath={file} />
                                 </> :
